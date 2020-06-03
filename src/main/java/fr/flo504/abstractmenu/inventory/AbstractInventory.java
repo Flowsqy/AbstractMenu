@@ -21,7 +21,7 @@ public abstract class AbstractInventory {
 
     private final MenuFactory factory;
 
-    private final Map<Integer, AbstractItem> items = new HashMap<>();
+    private final Map<Integer, InventorySlot> slots = new HashMap<>();
 
     public AbstractInventory(String name, int line, MenuFactory factory) {
         this(name, line, factory, Collections.emptyList());
@@ -62,7 +62,7 @@ public abstract class AbstractInventory {
     public final void open(Player player) {
         final Inventory inventory = Bukkit.createInventory(null, line*9, name);
 
-        items.forEach((key, value) -> inventory.setItem(key, value.getItem(player)));
+        slots.forEach((key, value) -> inventory.setItem(key, value.getItem(player)));
 
         factory.registerInventory(this, inventory);
         player.openInventory(inventory);
@@ -81,35 +81,35 @@ public abstract class AbstractInventory {
         if(item == null)
             return;
 
-        if(!items.containsKey(slot))
+        if(!slots.containsKey(slot))
             return;
 
-        final AbstractItem aItem = items.get(slot);
+        final InventorySlot inventorySlot = slots.get(slot);
 
-        aItem.onClick(player, clickType);
+        inventorySlot.onClick(player, clickType);
 
     }
 
-    protected final Map<Integer, AbstractItem> getItems(){
-        return this.items;
+    protected final Map<Integer, InventorySlot> getItems(){
+        return this.slots;
     }
 
     protected final Set<Integer> getSlots(){
-        return this.items.keySet();
+        return this.slots.keySet();
     }
 
-    protected final void registerItem(AbstractItem item, int slot) {
+    protected final void registerSlot(InventorySlot inventorySlot, int position) {
 
-        if(slot >= (this.line*9))
-            throw new UnsupportedOperationException("The inventory doesn't contain the slot " + slot);
+        if(position >= (this.line*9))
+            throw new UnsupportedOperationException("The inventory doesn't contain the slot " + position);
 
-        this.items.put(slot, item);
+        this.slots.put(position, inventorySlot);
 
     }
 
-    protected final void registerItem(AbstractItem item, List<Integer> slots) {
-        for(int slot : slots)
-            this.registerItem(item, slot);
+    protected final void registerItem(InventorySlot inventorySlot, List<Integer> positions) {
+        for(int position : positions)
+            this.registerItem(inventorySlot, positions);
     }
 
     protected abstract void setupItems(List<SlotInfo> info);

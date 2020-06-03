@@ -1,6 +1,7 @@
 package fr.flo504.abstractmenu.item;
 
 import com.mojang.authlib.GameProfile;
+import fr.flo504.abstractmenu.inventory.InventorySlot;
 import fr.flo504.abstractmenu.item.heads.HeadUtils;
 import fr.flo504.abstractmenu.parser.item.ItemInfo;
 import org.bukkit.ChatColor;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public abstract class AbstractItem {
+public abstract class AbstractItem implements InventorySlot {
 
     private String name;
     private Material material;
@@ -210,7 +211,4 @@ public abstract class AbstractItem {
         return this.item;
     }
 
-    public abstract ItemStack getItem(Player player);
-
-    public abstract void onClick(Player player, ClickType clickType);
 }

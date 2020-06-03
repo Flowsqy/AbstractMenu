@@ -1,0 +1,5 @@
+name: AbstractMenu
+author: Flo504
+version: ${project.version}
+main: fr.flo504.abstractmenu.AbstractMenuPlugin
+softdepend: [Reflect]

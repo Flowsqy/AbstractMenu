@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -66,6 +67,24 @@ public abstract class AbstractInventory {
 
         factory.registerInventory(this, inventory);
         player.openInventory(inventory);
+    }
+
+    public final void update(Player player) {
+        if(player == null)
+            return;
+
+        final InventoryView openInventory = player.getOpenInventory();
+        final Inventory inventory = openInventory.getTopInventory();
+
+        if(!openInventory.getTitle().equals(name) || inventory.getSize()/9 != line)
+            return;
+
+        slots.forEach((key, value) -> {
+            final ItemStack itemStack = value.getItem(player);
+            final ItemStack current = openInventory.getItem(key);
+            if(current == null || !current.equals(itemStack))
+                inventory.setItem(key, itemStack);
+        });
 
     }
 
@@ -107,9 +126,9 @@ public abstract class AbstractInventory {
 
     }
 
-    protected final void registerItem(InventorySlot inventorySlot, List<Integer> positions) {
+    protected final void registerSlot(InventorySlot inventorySlot, List<Integer> positions) {
         for(int position : positions)
-            this.registerItem(inventorySlot, positions);
+            this.registerSlot(inventorySlot, position);
     }
 
     protected abstract void setupItems(List<SlotInfo> info);

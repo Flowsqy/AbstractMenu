@@ -29,12 +29,14 @@ public class MultipleItem implements InventorySlot {
 
     @Override
     public void onClick(Player player, ClickType clickType) {
-        currentItem.onClick(player, clickType);
+        final AbstractItem clicked = currentItem;
         final ItemLink itemLink = links.get(currentItem);
         if(itemLink == null)
             return;
         if(itemLink.getPredicate().test(player, clickType))
             currentItem = itemLink.getItem();
+
+        clicked.onClick(player, clickType);
     }
 
     public MultipleItem registerItem(AbstractItem item, AbstractItem linked){
@@ -47,6 +49,7 @@ public class MultipleItem implements InventorySlot {
         Objects.requireNonNull(predicate);
 
         links.put(item, new ItemLink(linked, predicate));
+        currentItem = item;
 
         return this;
     }

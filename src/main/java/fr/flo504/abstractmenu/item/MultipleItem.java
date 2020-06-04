@@ -31,6 +31,8 @@ public class MultipleItem implements InventorySlot {
     public void onClick(Player player, ClickType clickType) {
         currentItem.onClick(player, clickType);
         final ItemLink itemLink = links.get(currentItem);
+        if(itemLink == null)
+            return;
         if(itemLink.getPredicate().test(player, clickType))
             currentItem = itemLink.getItem();
     }

@@ -22,6 +22,11 @@ public class MultipleItem implements InventorySlot {
         links = new HashMap<>();
     }
 
+    private MultipleItem(MultipleItem item){
+        this.links = new HashMap<>(item.links);
+        this.currentItem = item.currentItem;
+    }
+
     @Override
     public ItemStack getItem(Player player) {
         return currentItem == null ? null : currentItem.getItem(player);
@@ -52,6 +57,11 @@ public class MultipleItem implements InventorySlot {
         currentItem = item;
 
         return this;
+    }
+
+    @Override
+    public MultipleItem clone() {
+        return new MultipleItem(this);
     }
 
     private static final class ItemLink {

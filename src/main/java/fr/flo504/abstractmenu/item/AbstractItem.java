@@ -210,5 +210,4 @@ public abstract class AbstractItem implements InventorySlot {
     public final ItemStack getItem() {
         return this.item;
     }
-
 }

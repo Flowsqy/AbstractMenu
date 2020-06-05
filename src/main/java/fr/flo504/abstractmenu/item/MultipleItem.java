@@ -1,6 +1,7 @@
 package fr.flo504.abstractmenu.item;
 
 import fr.flo504.abstractmenu.inventory.InventorySlot;
+import fr.flo504.abstractmenu.utils.Cloneable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -10,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiPredicate;
 
-public class MultipleItem implements InventorySlot {
+public class MultipleItem implements InventorySlot, Cloneable {
 
     protected final static BiPredicate<Player, ClickType> ALWAYS = (player, clickType) -> true;
 

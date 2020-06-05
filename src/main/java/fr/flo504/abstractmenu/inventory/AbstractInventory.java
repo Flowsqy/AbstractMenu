@@ -1,9 +1,8 @@
 package fr.flo504.abstractmenu.inventory;
 
 import fr.flo504.abstractmenu.factory.MenuFactory;
-import fr.flo504.abstractmenu.item.AbstractItem;
-import fr.flo504.abstractmenu.parser.inventory.InventoryInfo;
 import fr.flo504.abstractmenu.parser.inventory.SlotInfo;
+import fr.flo504.abstractmenu.utils.Cloneable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -129,6 +128,17 @@ public abstract class AbstractInventory {
     protected final void registerSlot(InventorySlot inventorySlot, List<Integer> positions) {
         for(int position : positions)
             this.registerSlot(inventorySlot, position);
+    }
+
+    protected final void registerIndependentSlot(InventorySlot inventorySlot, List<Integer> positions) {
+        if(!(inventorySlot instanceof Cloneable)) {
+            registerSlot(inventorySlot, positions);
+            return;
+        }
+        final Cloneable cloneable = (Cloneable)inventorySlot;
+        for(int position : positions) {
+            this.registerSlot((InventorySlot) cloneable.clone(), position);
+        }
     }
 
     protected abstract void setupItems(List<SlotInfo> info);

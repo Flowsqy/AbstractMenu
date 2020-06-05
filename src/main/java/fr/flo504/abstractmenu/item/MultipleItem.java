@@ -12,7 +12,7 @@ import java.util.function.BiPredicate;
 
 public class MultipleItem implements InventorySlot {
 
-    private final BiPredicate<Player, ClickType> ALWAYS = (player, clickType) -> true;
+    protected final static BiPredicate<Player, ClickType> ALWAYS = (player, clickType) -> true;
 
     private final Map<AbstractItem, ItemLink> links;
 

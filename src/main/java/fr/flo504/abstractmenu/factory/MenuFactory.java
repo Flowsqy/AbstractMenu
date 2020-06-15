@@ -20,10 +20,7 @@ import java.util.Objects;
 
 public final class MenuFactory implements Listener {
 
-    private final Plugin plugin;
-
     public MenuFactory(Plugin plugin) {
-        this.plugin = plugin;
         inventories = new HashMap<>();
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }

@@ -37,10 +37,9 @@ public class MultipleItem implements InventorySlot, Cloneable {
     public void onClick(Player player, ClickType clickType) {
         final AbstractItem clicked = currentItem;
         final ItemLink itemLink = links.get(currentItem);
-        if(itemLink == null)
-            return;
-        if(itemLink.getPredicate().test(player, clickType))
-            currentItem = itemLink.getItem();
+        if(itemLink != null)
+            if(itemLink.getPredicate().test(player, clickType))
+                currentItem = itemLink.getItem();
 
         clicked.onClick(player, clickType);
     }

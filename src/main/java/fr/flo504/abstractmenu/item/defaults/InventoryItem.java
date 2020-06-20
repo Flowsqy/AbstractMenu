@@ -9,7 +9,6 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
-import java.util.Objects;
 
 public class InventoryItem extends AbstractItem {
 

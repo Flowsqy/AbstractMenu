@@ -1,9 +1,7 @@
 package fr.flo504.abstractmenu.item;
 
 import com.mojang.authlib.GameProfile;
-import fr.flo504.abstractmenu.inventory.InventorySlot;
 import fr.flo504.abstractmenu.item.heads.HeadUtils;
-import fr.flo504.abstractmenu.parser.item.ItemInfo;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -52,13 +50,13 @@ public class BaseItem {
         this.create();
     }
 
-    public BaseItem(ItemInfo info){
+    public BaseItem(BaseItem item){
         this(
-                info.getName(),
-                info.getMaterial(),
-                info.getLore(),
-                info.isGlow(),
-                info.getAmount()
+                item.getName(),
+                item.getMaterial(),
+                item.getLore(),
+                item.isGlow(),
+                item.getAmount()
         );
     }
 
@@ -164,15 +162,21 @@ public class BaseItem {
 
     }
 
-    @SuppressWarnings("deprecation")
     public void setOwner(String name) {
+
+        if (name != null && name.length() > 16) {
+            return;
+        }
 
         if(!(item.getItemMeta() instanceof SkullMeta))
             throw new UnsupportedOperationException("The item is not a player skull");
 
         final SkullMeta meta = (SkullMeta) item.getItemMeta();
 
-        meta.setOwner(name);
+        if(name == null)
+            HeadUtils.applyProfile(meta, null);
+        else
+            HeadUtils.applyProfile(meta, new GameProfile(null, name));
 
         item.setItemMeta(meta);
     }

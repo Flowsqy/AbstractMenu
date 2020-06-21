@@ -15,9 +15,9 @@ public class MultipleItem implements InventorySlot, Cloneable {
 
     protected final static BiPredicate<Player, ClickType> ALWAYS = (player, clickType) -> true;
 
-    private final Map<AbstractItem, ItemLink> links;
+    private final Map<InventorySlot, ItemLink> links;
 
-    private AbstractItem currentItem;
+    private InventorySlot currentItem;
 
     public MultipleItem() {
         links = new HashMap<>();
@@ -35,7 +35,7 @@ public class MultipleItem implements InventorySlot, Cloneable {
 
     @Override
     public void onClick(Player player, ClickType clickType) {
-        final AbstractItem clicked = currentItem;
+        final InventorySlot clicked = currentItem;
         final ItemLink itemLink = links.get(currentItem);
         if(itemLink != null)
             if(itemLink.getPredicate().test(player, clickType))
@@ -44,11 +44,11 @@ public class MultipleItem implements InventorySlot, Cloneable {
         clicked.onClick(player, clickType);
     }
 
-    public MultipleItem registerItem(AbstractItem item, AbstractItem linked){
+    public MultipleItem registerItem(InventorySlot item, InventorySlot linked){
         return registerItem(item, linked, ALWAYS);
     }
 
-    public MultipleItem registerItem(AbstractItem item, AbstractItem linked, BiPredicate<Player, ClickType> predicate){
+    public MultipleItem registerItem(InventorySlot item, InventorySlot linked, BiPredicate<Player, ClickType> predicate){
         Objects.requireNonNull(item);
         Objects.requireNonNull(linked);
         Objects.requireNonNull(predicate);
@@ -66,15 +66,15 @@ public class MultipleItem implements InventorySlot, Cloneable {
 
     private static final class ItemLink {
 
-        private final AbstractItem item;
+        private final InventorySlot item;
         private final BiPredicate<Player, ClickType> predicate;
 
-        public ItemLink(AbstractItem item, BiPredicate<Player, ClickType> predicate) {
+        public ItemLink(InventorySlot item, BiPredicate<Player, ClickType> predicate) {
             this.item = item;
             this.predicate = predicate;
         }
 
-        public AbstractItem getItem() {
+        public InventorySlot getItem() {
             return item;
         }
 

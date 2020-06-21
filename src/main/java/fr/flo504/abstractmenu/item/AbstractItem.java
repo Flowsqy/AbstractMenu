@@ -1,7 +1,6 @@
 package fr.flo504.abstractmenu.item;
 
 import fr.flo504.abstractmenu.inventory.InventorySlot;
-import fr.flo504.abstractmenu.parser.item.ItemInfo;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -18,7 +17,8 @@ public abstract class AbstractItem extends BaseItem implements InventorySlot {
         super(name, material, lore, glow, amount);
     }
 
-    public AbstractItem(ItemInfo info) {
-        super(info);
+    public AbstractItem(BaseItem item) {
+        super(item);
     }
+
 }

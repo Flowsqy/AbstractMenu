@@ -20,7 +20,6 @@ public class HeadUtils {
 
     public static void applyProfile(SkullMeta meta, GameProfile profile){
         Objects.requireNonNull(meta);
-        Objects.requireNonNull(profile);
         Reflect.set(profileField, meta, profile);
     }
 

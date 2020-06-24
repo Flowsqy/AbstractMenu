@@ -1,20 +1,18 @@
 package fr.flo504.abstractmenu.parser.inventory;
 
-import fr.flo504.abstractmenu.parser.item.ItemInfo;
+import fr.flo504.abstractmenu.parser.item.InventorySlotParser;
 import fr.flo504.abstractmenu.parser.item.ItemParser;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class InventoryParser {
 
-    public static InventoryInfo parseInventory(ConfigurationSection section){
+    public static InventoryInfo parseInventory(ConfigurationSection section, Map<String, InventorySlotParser> parserData){
         Objects.requireNonNull(section);
+        Objects.requireNonNull(parserData);
 
         final String title = ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(section.getString("title", "")));
         int line = section.getInt("line", 1);
@@ -33,6 +31,15 @@ public class InventoryParser {
             for(String key : items.getKeys(false)){
                 final ConfigurationSection slotSection = items.getConfigurationSection(key);
                 assert slotSection != null : "Section is gotten from key name, so can not be null";
+
+                final String parserName = slotSection.getString("parser");
+                if(parserName == null)
+                    continue;
+
+                final InventorySlotParser parser = parserData.get(parserName);
+                if(parser == null)
+                    continue;
+
                 final List<Integer> slots = slotSection.getIntegerList("slots").stream()
                         .filter(slot -> slot >= 0 && slot < maxSlot)
                         .collect(Collectors.toList());
@@ -42,15 +49,15 @@ public class InventoryParser {
                 final Optional<String> itemKey = slotSection
                         .getKeys(false)
                         .stream()
-                        .filter(possibleItemKey -> !possibleItemKey.equals("slots"))
+                        .filter(possibleItemKey -> !possibleItemKey.equals("slots") && !possibleItemKey.equals("parser"))
                         .findFirst();
 
                 if(!itemKey.isPresent())
                     continue;
 
-                final ItemInfo info = ItemParser.parseItem(slotSection.getConfigurationSection(itemKey.get()));
+                final InventorySlotParser.ItemStackData info = ItemParser.parseItem(slotSection.getConfigurationSection(itemKey.get()), parser, parserData);
 
-                if(info == null)
+                if(info == null || info.getItem() == null)
                     continue;
 
                 slotInfo.add(

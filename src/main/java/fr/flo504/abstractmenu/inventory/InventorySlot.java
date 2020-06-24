@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 
-public interface InventorySlot{
+public interface InventorySlot {
 
     ItemStack getItem(Player player);
 

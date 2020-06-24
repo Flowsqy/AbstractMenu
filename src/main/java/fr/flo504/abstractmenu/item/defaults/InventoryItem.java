@@ -2,7 +2,6 @@ package fr.flo504.abstractmenu.item.defaults;
 
 import fr.flo504.abstractmenu.inventory.AbstractInventory;
 import fr.flo504.abstractmenu.item.AbstractItem;
-import fr.flo504.abstractmenu.parser.item.ItemInfo;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -19,9 +18,8 @@ public class InventoryItem extends AbstractItem {
 
     }
 
-    public InventoryItem(ItemInfo info) {
-        super(info);
-
+    public InventoryItem(InventoryItem item) {
+        super(item);
     }
 
     public InventoryItem(String name, Material material, List<String> lore, boolean glow, int amount) {
@@ -38,8 +36,8 @@ public class InventoryItem extends AbstractItem {
         this.inventory = inventory;
     }
 
-    public InventoryItem(ItemInfo info, AbstractInventory inventory) {
-        super(info);
+    public InventoryItem(InventoryItem item, AbstractInventory inventory) {
+        super(item);
         this.inventory = inventory;
     }
 

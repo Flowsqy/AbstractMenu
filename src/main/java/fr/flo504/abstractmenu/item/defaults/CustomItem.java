@@ -1,7 +1,6 @@
 package fr.flo504.abstractmenu.item.defaults;
 
 import fr.flo504.abstractmenu.item.AbstractItem;
-import fr.flo504.abstractmenu.parser.item.ItemInfo;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -26,9 +25,8 @@ public class CustomItem extends AbstractItem {
         this.action = null;
     }
 
-    public CustomItem(ItemInfo info) {
-        super(info);
-        this.action = null;
+    public CustomItem(CustomItem item) {
+        super(item);
     }
 
     public CustomItem(ItemStack item, BiConsumer<Player, ClickType> action) {
@@ -41,11 +39,10 @@ public class CustomItem extends AbstractItem {
         this.action = action;
     }
 
-    public CustomItem(ItemInfo info, BiConsumer<Player, ClickType> action) {
-        super(info);
+    public CustomItem(CustomItem item, BiConsumer<Player, ClickType> action) {
+        super(item);
         this.action = action;
     }
-
 
     public CustomItem(ItemStack item, Function<Player, ItemStack> specificItemFunction) {
         super(item);
@@ -59,9 +56,8 @@ public class CustomItem extends AbstractItem {
         this.specificItemFunction = specificItemFunction;
     }
 
-    public CustomItem(ItemInfo info, Function<Player, ItemStack> specificItemFunction) {
-        super(info);
-        this.action = null;
+    public CustomItem(CustomItem item, Function<Player, ItemStack> specificItemFunction) {
+        super(item);
         this.specificItemFunction = specificItemFunction;
     }
 
@@ -77,8 +73,8 @@ public class CustomItem extends AbstractItem {
         this.specificItemFunction = specificItemFunction;
     }
 
-    public CustomItem(ItemInfo info, BiConsumer<Player, ClickType> action, Function<Player, ItemStack> specificItemFunction) {
-        super(info);
+    public CustomItem(CustomItem item, BiConsumer<Player, ClickType> action, Function<Player, ItemStack> specificItemFunction) {
+        super(item);
         this.action = action;
         this.specificItemFunction = specificItemFunction;
     }

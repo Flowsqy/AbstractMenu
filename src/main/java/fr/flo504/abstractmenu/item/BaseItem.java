@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class BaseItem {
+public class BaseItem implements ItemStackGetter {
 
     private String name;
     private Material material;

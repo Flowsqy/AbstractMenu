@@ -17,7 +17,7 @@ public abstract class AbstractItem extends BaseItem implements InventorySlot {
         super(name, material, lore, glow, amount);
     }
 
-    public AbstractItem(BaseItem item) {
+    public AbstractItem(AbstractItem item) {
         super(item);
     }
 

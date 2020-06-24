@@ -1,7 +1,6 @@
 package fr.flo504.abstractmenu.item.defaults;
 
 import fr.flo504.abstractmenu.item.AbstractItem;
-import fr.flo504.abstractmenu.parser.item.ItemInfo;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -18,8 +17,8 @@ public class BasicItem extends AbstractItem {
         super(name, material, lore, enchanted, amount);
     }
 
-    public BasicItem(ItemInfo info) {
-        super(info);
+    public BasicItem(AbstractItem item) {
+        super(item);
     }
 
     @Override

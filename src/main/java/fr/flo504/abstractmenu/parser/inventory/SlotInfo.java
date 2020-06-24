@@ -1,23 +1,23 @@
 package fr.flo504.abstractmenu.parser.inventory;
 
-import fr.flo504.abstractmenu.parser.item.ItemInfo;
+import fr.flo504.abstractmenu.parser.item.InventorySlotParser;
 
 import java.util.List;
 import java.util.Objects;
 
 public class SlotInfo {
 
-    private final ItemInfo item;
+    private final InventorySlotParser.ItemStackData item;
     private final List<Integer> slots;
 
-    public SlotInfo(ItemInfo item, List<Integer> slots) {
+    public SlotInfo(InventorySlotParser.ItemStackData item, List<Integer> slots) {
         Objects.requireNonNull(item);
         Objects.requireNonNull(slots);
         this.item = item;
         this.slots = slots;
     }
 
-    public ItemInfo getItem() {
+    public InventorySlotParser.ItemStackData getItem() {
         return item;
     }
 

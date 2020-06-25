@@ -83,4 +83,21 @@ public class MultipleItem implements InventorySlot, Cloneable {
         }
     }
 
+    public static final class ISGInventorySlot implements InventorySlot {
+
+        private final ItemStackGetter itemStackGetter;
+
+        public ISGInventorySlot(ItemStackGetter itemStackGetter) {
+            this.itemStackGetter = itemStackGetter;
+        }
+
+        @Override
+        public ItemStack getItem(Player player) {
+            return itemStackGetter.getItem();
+        }
+
+        @Override
+        public void onClick(Player player, ClickType clickType) {}
+    }
+
 }

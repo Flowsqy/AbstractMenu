@@ -1,6 +1,6 @@
 package fr.flo504.abstractmenu.parser.item;
 
-import fr.flo504.abstractmenu.item.ItemStackGetter;
+import fr.flo504.abstractmenu.item.InventorySlot;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Map;
@@ -8,14 +8,14 @@ import java.util.Objects;
 
 public interface InventorySlotParser {
 
-    ItemStackData parse(ConfigurationSection section, Map<String, InventorySlotParser> parserData);
+    ItemData parse(ConfigurationSection section, Map<String, InventorySlotParser> parserData);
 
-    final class ItemStackData {
+    final class ItemData {
 
         private final String id;
-        private final ItemStackGetter item;
+        private final InventorySlot item;
 
-        public ItemStackData(String id, ItemStackGetter item) {
+        public ItemData(String id, InventorySlot item) {
             this.id = id;
             this.item = item;
         }
@@ -24,7 +24,7 @@ public interface InventorySlotParser {
             return id;
         }
 
-        public ItemStackGetter getItem() {
+        public InventorySlot getItem() {
             return item;
         }
 
@@ -32,7 +32,7 @@ public interface InventorySlotParser {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            ItemStackData that = (ItemStackData) o;
+            ItemData that = (ItemData) o;
             return Objects.equals(id, that.id) &&
                     Objects.equals(item, that.item);
         }

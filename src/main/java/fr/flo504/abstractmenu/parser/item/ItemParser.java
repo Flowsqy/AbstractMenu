@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class ItemParser {
 
-    public static InventorySlotParser.ItemStackData parseItem(ConfigurationSection section, InventorySlotParser parser, Map<String, InventorySlotParser> parserData){
+    public static InventorySlotParser.ItemData parseItem(ConfigurationSection section, InventorySlotParser parser, Map<String, InventorySlotParser> parserData){
         Objects.requireNonNull(parser);
         return parser.parse(section, parserData);
     }

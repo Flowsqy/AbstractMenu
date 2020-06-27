@@ -7,17 +7,17 @@ import java.util.Objects;
 
 public class SlotInfo {
 
-    private final InventorySlotParser.ItemStackData item;
+    private final InventorySlotParser.ItemData item;
     private final List<Integer> slots;
 
-    public SlotInfo(InventorySlotParser.ItemStackData item, List<Integer> slots) {
+    public SlotInfo(InventorySlotParser.ItemData item, List<Integer> slots) {
         Objects.requireNonNull(item);
         Objects.requireNonNull(slots);
         this.item = item;
         this.slots = slots;
     }
 
-    public InventorySlotParser.ItemStackData getItem() {
+    public InventorySlotParser.ItemData getItem() {
         return item;
     }
 

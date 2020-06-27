@@ -55,7 +55,7 @@ public class InventoryParser {
                 if(!itemKey.isPresent())
                     continue;
 
-                final InventorySlotParser.ItemStackData info = ItemParser.parseItem(slotSection.getConfigurationSection(itemKey.get()), parser, parserData);
+                final InventorySlotParser.ItemData info = ItemParser.parseItem(slotSection.getConfigurationSection(itemKey.get()), parser, parserData);
 
                 if(info == null || info.getItem() == null)
                     continue;

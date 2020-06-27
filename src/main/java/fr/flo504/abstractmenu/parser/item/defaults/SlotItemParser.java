@@ -1,7 +1,9 @@
 package fr.flo504.abstractmenu.parser.item.defaults;
 
 import fr.flo504.abstractmenu.item.BaseItem;
+import fr.flo504.abstractmenu.item.SlotItem;
 import fr.flo504.abstractmenu.parser.item.InventorySlotParser;
+import net.minecraft.server.v1_16_R1.Slot;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -11,9 +13,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class BaseItemParser implements InventorySlotParser {
+public class SlotItemParser implements InventorySlotParser {
     @Override
-    public ItemStackData parse(ConfigurationSection section, Map<String, InventorySlotParser> parserData) {
+    public ItemData parse(ConfigurationSection section, Map<String, InventorySlotParser> parserData) {
         Objects.requireNonNull(section);
         Objects.requireNonNull(parserData);
 
@@ -44,9 +46,9 @@ public class BaseItemParser implements InventorySlotParser {
         final int amount = section.getInt("amount", 0);
         final boolean glow = section.getBoolean("glow", false);
 
-        return new ItemStackData(
+        return new ItemData(
                 id,
-                new BaseItem(
+                new SlotItem(
                         name,
                         material,
                         lore,

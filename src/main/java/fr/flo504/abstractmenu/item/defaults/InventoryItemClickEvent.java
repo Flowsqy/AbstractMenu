@@ -7,11 +7,11 @@ import org.bukkit.event.inventory.ClickType;
 
 import java.util.Objects;
 
-public class InventoryItem implements ItemClickEvent {
+public class InventoryItemClickEvent implements ItemClickEvent {
 
     private BaseInventory inventory;
 
-    public InventoryItem(BaseInventory inventory) {
+    public InventoryItemClickEvent(BaseInventory inventory) {
         this.inventory = inventory;
     }
 
@@ -26,7 +26,7 @@ public class InventoryItem implements ItemClickEvent {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        InventoryItem that = (InventoryItem) o;
+        InventoryItemClickEvent that = (InventoryItemClickEvent) o;
         return Objects.equals(inventory, that.inventory);
     }
 

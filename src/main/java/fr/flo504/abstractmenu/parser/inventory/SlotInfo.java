@@ -1,7 +1,6 @@
 package fr.flo504.abstractmenu.parser.inventory;
 
 import fr.flo504.abstractmenu.item.InventorySlot;
-import fr.flo504.abstractmenu.parser.item.InventorySlotParser;
 
 import java.util.List;
 import java.util.Objects;

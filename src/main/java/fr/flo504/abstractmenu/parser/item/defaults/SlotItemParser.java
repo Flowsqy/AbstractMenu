@@ -1,6 +1,5 @@
 package fr.flo504.abstractmenu.parser.item.defaults;
 
-import fr.flo504.abstractmenu.item.InventorySlot;
 import fr.flo504.abstractmenu.item.SlotItem;
 import fr.flo504.abstractmenu.parser.item.InventorySlotParser;
 import org.bukkit.ChatColor;

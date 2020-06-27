@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 public class SlotItemParser implements InventorySlotParser {
     @Override
-    public InventorySlot parse(ConfigurationSection section, Map<String, InventorySlotParser> parserData) {
+    public SlotItem parse(ConfigurationSection section, Map<String, InventorySlotParser> parserData) {
         Objects.requireNonNull(section);
         Objects.requireNonNull(parserData);
 

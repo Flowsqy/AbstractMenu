@@ -119,9 +119,9 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
 
     public static final class ItemLink {
 
-        private final InventorySlot item;
-        private final BiPredicate<Player, ClickType> predicate;
-        private final ItemClickEvent event;
+        private InventorySlot item;
+        private BiPredicate<Player, ClickType> predicate;
+        private ItemClickEvent event;
 
         public ItemLink(InventorySlot item, BiPredicate<Player, ClickType> predicate, ItemClickEvent event) {
             this.item = item;
@@ -139,6 +139,18 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
 
         public ItemClickEvent getEvent() {
             return event;
+        }
+
+        public void setItem(InventorySlot item) {
+            this.item = item;
+        }
+
+        public void setPredicate(BiPredicate<Player, ClickType> predicate) {
+            this.predicate = predicate;
+        }
+
+        public void setEvent(ItemClickEvent event) {
+            this.event = event;
         }
 
         @Override

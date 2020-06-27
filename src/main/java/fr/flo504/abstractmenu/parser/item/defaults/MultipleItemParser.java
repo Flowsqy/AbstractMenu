@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public class MultipleItemParser implements InventorySlotParser {
     @Override
-    public InventorySlot parse(ConfigurationSection section, Map<String, InventorySlotParser> parserData) {
+    public MultipleItem parse(ConfigurationSection section, Map<String, InventorySlotParser> parserData) {
         Objects.requireNonNull(section);
         Objects.requireNonNull(parserData);
 
@@ -49,6 +49,17 @@ public class MultipleItemParser implements InventorySlotParser {
             items.put(key, item);
         }
 
-        return null;
+        for(Map.Entry<String, String> entry : links.entrySet()){
+            final InventorySlot first = items.get(entry.getKey());
+            if(first == null)
+                continue;
+            final InventorySlot second = items.get(entry.getValue());
+            if(second == null)
+                continue;
+
+            multipleItem.registerItem(first, second);
+        }
+
+        return multipleItem;
     }
 }

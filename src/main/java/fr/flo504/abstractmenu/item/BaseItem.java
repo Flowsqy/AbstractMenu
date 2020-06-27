@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 public class BaseItem implements Cloneable {
 
+    private String id;
+
     private String name;
     private Material material;
     private List<String> lore;
@@ -24,8 +26,10 @@ public class BaseItem implements Cloneable {
 
     private ItemStack item;
 
-    public BaseItem(ItemStack item) {
+    public BaseItem(String id, ItemStack item) {
         Objects.requireNonNull(item);
+
+        this.id = id;
 
         this.item = item;
 
@@ -42,7 +46,8 @@ public class BaseItem implements Cloneable {
 
     }
 
-    public BaseItem(String name, Material material, List<String> lore, boolean glow, int amount) {
+    public BaseItem(String id, String name, Material material, List<String> lore, boolean glow, int amount) {
+        this.id = id;
         this.name = formatName(name);
         this.material = material;
         this.lore = formatLore(lore);
@@ -53,6 +58,7 @@ public class BaseItem implements Cloneable {
 
     private BaseItem(BaseItem item){
         this(
+                item.getId(),
                 item.getName(),
                 item.getMaterial(),
                 item.getLore(),
@@ -84,6 +90,14 @@ public class BaseItem implements Cloneable {
         return lore.stream()
                 .map(line -> ChatColor.RESET + line)
                 .collect(Collectors.toList());
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -226,6 +240,7 @@ public class BaseItem implements Cloneable {
         if (o == null || getClass() != o.getClass()) return false;
         BaseItem baseItem = (BaseItem) o;
         return amount == baseItem.amount &&
+                Objects.equals(id, baseItem.id) &&
                 Objects.equals(name, baseItem.name) &&
                 material == baseItem.material &&
                 Objects.equals(lore, baseItem.lore) &&
@@ -235,13 +250,14 @@ public class BaseItem implements Cloneable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, material, lore, glow, amount, item);
+        return Objects.hash(id, name, material, lore, glow, amount, item);
     }
 
     @Override
     public String toString() {
         return "BaseItem{" +
-                "name='" + name + '\'' +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
                 ", material=" + material +
                 ", lore=" + lore +
                 ", glow=" + glow +

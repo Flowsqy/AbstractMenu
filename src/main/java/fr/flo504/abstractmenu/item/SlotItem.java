@@ -14,21 +14,21 @@ public class SlotItem extends BaseItem implements InventorySlot {
 
     private Function<Player, ItemStack> itemSlotFunction;
 
-    public SlotItem(ItemStack item) {
-        super(item);
+    public SlotItem(String id, ItemStack item) {
+        super(id, item);
     }
 
-    public SlotItem(String name, Material material, List<String> lore, boolean glow, int amount) {
-        super(name, material, lore, glow, amount);
+    public SlotItem(String id, String name, Material material, List<String> lore, boolean glow, int amount) {
+        super(id, name, material, lore, glow, amount);
     }
 
-    public SlotItem(ItemStack item, Function<Player, ItemStack> itemSlotFunction) {
-        super(item);
+    public SlotItem(String id, ItemStack item, Function<Player, ItemStack> itemSlotFunction) {
+        super(id, item);
         this.itemSlotFunction = itemSlotFunction;
     }
 
-    public SlotItem(String name, Material material, List<String> lore, boolean glow, int amount, Function<Player, ItemStack> itemSlotFunction) {
-        super(name, material, lore, glow, amount);
+    public SlotItem(String id, String name, Material material, List<String> lore, boolean glow, int amount, Function<Player, ItemStack> itemSlotFunction) {
+        super(id, name, material, lore, glow, amount);
         this.itemSlotFunction = itemSlotFunction;
     }
 

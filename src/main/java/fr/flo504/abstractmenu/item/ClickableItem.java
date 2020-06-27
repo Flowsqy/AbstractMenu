@@ -12,39 +12,39 @@ public class ClickableItem extends SlotItem {
 
     private ItemClickEvent event;
 
-    public ClickableItem(ItemStack item) {
-        super(item);
+    public ClickableItem(String id, ItemStack item) {
+        super(id, item);
     }
 
-    public ClickableItem(String name, Material material, List<String> lore, boolean glow, int amount) {
-        super(name, material, lore, glow, amount);
+    public ClickableItem(String id, String name, Material material, List<String> lore, boolean glow, int amount) {
+        super(id, name, material, lore, glow, amount);
     }
 
-    public ClickableItem(ItemStack item, Function<Player, ItemStack> itemSlotFunction) {
-        super(item, itemSlotFunction);
+    public ClickableItem(String id, ItemStack item, Function<Player, ItemStack> itemSlotFunction) {
+        super(id, item, itemSlotFunction);
     }
 
-    public ClickableItem(String name, Material material, List<String> lore, boolean glow, int amount, Function<Player, ItemStack> itemSlotFunction) {
-        super(name, material, lore, glow, amount, itemSlotFunction);
+    public ClickableItem(String id, String name, Material material, List<String> lore, boolean glow, int amount, Function<Player, ItemStack> itemSlotFunction) {
+        super(id, name, material, lore, glow, amount, itemSlotFunction);
     }
 
-    public ClickableItem(ItemStack item, ItemClickEvent event) {
-        super(item);
+    public ClickableItem(String id, ItemStack item, ItemClickEvent event) {
+        super(id, item);
         setEvent(event);
     }
 
-    public ClickableItem(String name, Material material, List<String> lore, boolean glow, int amount, ItemClickEvent event) {
-        super(name, material, lore, glow, amount);
+    public ClickableItem(String id, String name, Material material, List<String> lore, boolean glow, int amount, ItemClickEvent event) {
+        super(id, name, material, lore, glow, amount);
         this.event = event;
     }
 
-    public ClickableItem(ItemStack item, Function<Player, ItemStack> itemSlotFunction, ItemClickEvent event) {
-        super(item, itemSlotFunction);
+    public ClickableItem(String id, ItemStack item, Function<Player, ItemStack> itemSlotFunction, ItemClickEvent event) {
+        super(id, item, itemSlotFunction);
         this.event = event;
     }
 
-    public ClickableItem(String name, Material material, List<String> lore, boolean glow, int amount, Function<Player, ItemStack> itemSlotFunction, ItemClickEvent event) {
-        super(name, material, lore, glow, amount, itemSlotFunction);
+    public ClickableItem(String id, String name, Material material, List<String> lore, boolean glow, int amount, Function<Player, ItemStack> itemSlotFunction, ItemClickEvent event) {
+        super(id, name, material, lore, glow, amount, itemSlotFunction);
         this.event = event;
     }
 

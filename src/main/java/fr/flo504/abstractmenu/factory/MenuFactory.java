@@ -1,6 +1,6 @@
 package fr.flo504.abstractmenu.factory;
 
-import fr.flo504.abstractmenu.inventory.AbstractInventory;
+import fr.flo504.abstractmenu.inventory.BaseInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,9 +25,9 @@ public final class MenuFactory implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    private final Map<Inventory, AbstractInventory> inventories;
+    private final Map<Inventory, BaseInventory> inventories;
 
-    public final void registerInventory(AbstractInventory abstractInventory, Inventory inventory) {
+    public final void registerInventory(BaseInventory abstractInventory, Inventory inventory) {
         this.inventories.put(inventory, abstractInventory);
     }
 
@@ -37,7 +37,7 @@ public final class MenuFactory implements Listener {
         if(!inventories.containsKey(e.getInventory()))
             return;
 
-        final AbstractInventory inventory = inventories.get(e.getInventory());
+        final BaseInventory inventory = inventories.get(e.getInventory());
 
         final boolean customInventory = e.getClickedInventory() != null && !e.getClickedInventory().equals(e.getWhoClicked().getInventory());
 

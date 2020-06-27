@@ -1,64 +1,44 @@
 package fr.flo504.abstractmenu.item.defaults;
 
-import fr.flo504.abstractmenu.inventory.AbstractInventory;
-import fr.flo504.abstractmenu.item.AbstractItem;
-import org.bukkit.Material;
+import fr.flo504.abstractmenu.inventory.BaseInventory;
+import fr.flo504.abstractmenu.item.ItemClickEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
+import java.util.Objects;
 
-public class InventoryItem extends AbstractItem {
+public class InventoryItem implements ItemClickEvent {
 
-    private AbstractInventory inventory;
+    private BaseInventory inventory;
 
-    public InventoryItem(ItemStack item) {
-        super(item);
-
-    }
-
-    public InventoryItem(InventoryItem item) {
-        super(item);
-    }
-
-    public InventoryItem(String name, Material material, List<String> lore, boolean glow, int amount) {
-        super(name, material, lore, glow, amount);
-    }
-
-    public InventoryItem(ItemStack item, AbstractInventory inventory) {
-        super(item);
-        this.inventory = inventory;
-    }
-
-    public InventoryItem(String name, Material material, List<String> lore, boolean glow, int amount, AbstractInventory inventory) {
-        super(name, material, lore, glow, amount);
-        this.inventory = inventory;
-    }
-
-    public InventoryItem(InventoryItem item, AbstractInventory inventory) {
-        super(item);
-        this.inventory = inventory;
-    }
-
-    public AbstractInventory getInventory() {
-        return inventory;
-    }
-
-    public void setInventory(AbstractInventory inventory) {
+    public InventoryItem(BaseInventory inventory) {
         this.inventory = inventory;
     }
 
     @Override
-    public ItemStack getItem(Player player) {
-        return super.getItem();
-    }
-
-    @Override
-    public void onClick(Player player, ClickType clickType) {
-        if(inventory == null)
-            player.closeInventory();
-        else
+    public void onClick(ClickType type, Player player) {
+        if(inventory != null)
             inventory.open(player);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        InventoryItem that = (InventoryItem) o;
+        return Objects.equals(inventory, that.inventory);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(inventory);
+    }
+
+    @Override
+    public String toString() {
+        return "InventoryItem{" +
+                "inventory=" + inventory +
+                '}';
     }
 }

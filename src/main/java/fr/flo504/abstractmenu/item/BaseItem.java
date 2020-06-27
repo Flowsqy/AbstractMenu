@@ -2,6 +2,7 @@ package fr.flo504.abstractmenu.item;
 
 import com.mojang.authlib.GameProfile;
 import fr.flo504.abstractmenu.item.heads.HeadUtils;
+import fr.flo504.abstractmenu.utils.Cloneable;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class BaseItem implements ItemStackGetter {
+public class BaseItem implements Cloneable {
 
     private String name;
     private Material material;
@@ -50,7 +51,7 @@ public class BaseItem implements ItemStackGetter {
         this.create();
     }
 
-    public BaseItem(BaseItem item){
+    private BaseItem(BaseItem item){
         this(
                 item.getName(),
                 item.getMaterial(),
@@ -212,5 +213,40 @@ public class BaseItem implements ItemStackGetter {
 
     public final ItemStack getItem() {
         return this.item;
+    }
+
+    @Override
+    public BaseItem clone() {
+        return new BaseItem(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BaseItem baseItem = (BaseItem) o;
+        return amount == baseItem.amount &&
+                Objects.equals(name, baseItem.name) &&
+                material == baseItem.material &&
+                Objects.equals(lore, baseItem.lore) &&
+                Objects.equals(glow, baseItem.glow) &&
+                Objects.equals(item, baseItem.item);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, material, lore, glow, amount, item);
+    }
+
+    @Override
+    public String toString() {
+        return "BaseItem{" +
+                "name='" + name + '\'' +
+                ", material=" + material +
+                ", lore=" + lore +
+                ", glow=" + glow +
+                ", amount=" + amount +
+                ", item=" + item +
+                '}';
     }
 }

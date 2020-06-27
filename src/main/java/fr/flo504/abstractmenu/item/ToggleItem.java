@@ -1,6 +1,5 @@
 package fr.flo504.abstractmenu.item;
 
-import fr.flo504.abstractmenu.inventory.InventorySlot;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 

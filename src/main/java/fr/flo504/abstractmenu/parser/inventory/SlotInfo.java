@@ -1,5 +1,6 @@
 package fr.flo504.abstractmenu.parser.inventory;
 
+import fr.flo504.abstractmenu.item.InventorySlot;
 import fr.flo504.abstractmenu.parser.item.InventorySlotParser;
 
 import java.util.List;
@@ -7,17 +8,17 @@ import java.util.Objects;
 
 public class SlotInfo {
 
-    private final InventorySlotParser.ItemData item;
+    private final InventorySlot item;
     private final List<Integer> slots;
 
-    public SlotInfo(InventorySlotParser.ItemData item, List<Integer> slots) {
+    public SlotInfo(InventorySlot item, List<Integer> slots) {
         Objects.requireNonNull(item);
         Objects.requireNonNull(slots);
         this.item = item;
         this.slots = slots;
     }
 
-    public InventorySlotParser.ItemData getItem() {
+    public InventorySlot getItem() {
         return item;
     }
 

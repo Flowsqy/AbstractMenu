@@ -83,12 +83,12 @@ public class BaseItem implements Cloneable {
     }
 
     protected String formatName(String name){
-        return ChatColor.RESET+name;
+        return ChatColor.RESET+ChatColor.WHITE.toString()+name;
     }
 
     protected List<String> formatLore(List<String> lore){
         return lore.stream()
-                .map(line -> ChatColor.RESET + line)
+                .map(line -> ChatColor.RESET + ChatColor.WHITE.toString() + line)
                 .collect(Collectors.toList());
     }
 

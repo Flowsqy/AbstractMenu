@@ -34,7 +34,7 @@ public class BaseInventory {
     }
 
     protected String formatTitle(String title){
-        return ChatColor.RESET + title;
+        return ChatColor.RESET + ChatColor.WHITE.toString() + title;
     }
 
     public String getName() {

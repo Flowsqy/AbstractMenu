@@ -12,28 +12,12 @@ import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
-public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entry<InventorySlot, MultipleItem.ItemLink>> {
+public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterable<Map.Entry<InventorySlot, MultipleItem.ItemLink>> {
 
     protected final static BiPredicate<Player, ClickType> ALWAYS = (player, clickType) -> true;
 
     private final Map<InventorySlot, ItemLink> links;
-    private final ItemClickEvent event = new ItemClickEvent() {
-        @Override
-        public void onClick(ClickType type, Player player) {
-            final ItemClickEvent clicked = currentEvent;
-            final ItemLink itemLink = links.get(currentItem);
-            if(itemLink != null) {
-                if (itemLink.getPredicate().test(player, type)) {
-                    currentItem = itemLink.getItem();
-                    currentEvent = itemLink.getEvent();
-                }
-            }
-
-            if(clicked != null)
-                clicked.onClick(type, player);
-
-        }
-    };
+    private final ItemClickEvent event = new MultipleItemClickEvent();
 
     private InventorySlot currentItem;
     private ItemClickEvent currentEvent;
@@ -180,6 +164,26 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
                     ", event=" + event +
                     '}';
         }
+    }
+
+    private final class MultipleItemClickEvent implements ItemClickEvent {
+
+        @Override
+        public void onClick(ClickType type, Player player) {
+            final ItemClickEvent clicked = currentEvent;
+            final ItemLink itemLink = links.get(currentItem);
+            if(itemLink != null) {
+                if (itemLink.getPredicate().test(player, type)) {
+                    currentItem = itemLink.getItem();
+                    currentEvent = itemLink.getEvent();
+                }
+            }
+
+            if(clicked != null)
+                clicked.onClick(type, player);
+
+        }
+
     }
 
 }

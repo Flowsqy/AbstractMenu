@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class ClickableItem extends SlotItem {
+public class ClickableItem extends SlotItem implements Clickable {
 
     private ItemClickEvent event;
 

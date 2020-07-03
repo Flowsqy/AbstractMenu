@@ -22,13 +22,16 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
         public void onClick(ClickType type, Player player) {
             final ItemClickEvent clicked = currentEvent;
             final ItemLink itemLink = links.get(currentItem);
-            if(itemLink != null)
-                if(itemLink.getPredicate().test(player, type)){
+            if(itemLink != null) {
+                if (itemLink.getPredicate().test(player, type)) {
                     currentItem = itemLink.getItem();
                     currentEvent = itemLink.getEvent();
                 }
+            }
 
-            clicked.onClick(type, player);
+            if(clicked != null)
+                clicked.onClick(type, player);
+
         }
     };
 
@@ -72,7 +75,8 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
         Objects.requireNonNull(predicate);
 
         links.put(item, new ItemLink(linked, predicate, event));
-        currentItem = item;
+        currentItem = linked;
+        currentEvent = event;
 
         return this;
     }

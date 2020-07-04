@@ -41,7 +41,9 @@ public class ToggleItemParser implements InventorySlotParser {
             return null;
         
         final ToggleItem toggleItem = new ToggleItem();
-        
+
+        toggleItem.setId(section.getName());
+
         toggleItem.registerItems(first, second);
 
         return toggleItem;

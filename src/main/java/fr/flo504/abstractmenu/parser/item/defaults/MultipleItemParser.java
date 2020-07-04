@@ -60,6 +60,8 @@ public class MultipleItemParser implements InventorySlotParser {
             multipleItem.registerItem(first, second);
         }
 
+        multipleItem.setId(section.getName());
+
         return multipleItem;
     }
 }

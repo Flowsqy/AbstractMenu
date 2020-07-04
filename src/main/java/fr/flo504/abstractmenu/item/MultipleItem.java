@@ -19,6 +19,8 @@ public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterab
     private final Map<InventorySlot, ItemLink> links;
     private final ItemClickEvent event = new MultipleItemClickEvent();
 
+    private String id;
+
     private InventorySlot currentItem;
     private ItemClickEvent currentEvent;
 
@@ -27,9 +29,19 @@ public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterab
     }
 
     private MultipleItem(MultipleItem item){
+        this.id = item.id;
         this.links = new HashMap<>(item.links);
         this.currentItem = item.currentItem;
         this.currentEvent = item.currentEvent;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override
@@ -87,14 +99,15 @@ public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterab
         if (o == null || getClass() != o.getClass()) return false;
         MultipleItem that = (MultipleItem) o;
         return links.equals(that.links) &&
-                event.equals(that.event) &&
+                Objects.equals(event, that.event) &&
+                Objects.equals(id, that.id) &&
                 Objects.equals(currentItem, that.currentItem) &&
                 Objects.equals(currentEvent, that.currentEvent);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(links, event, currentItem, currentEvent);
+        return Objects.hash(links, event, id, currentItem, currentEvent);
     }
 
     @Override
@@ -102,6 +115,7 @@ public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterab
         return "MultipleItem{" +
                 "links=" + links +
                 ", event=" + event +
+                ", id='" + id + '\'' +
                 ", currentItem=" + currentItem +
                 ", currentEvent=" + currentEvent +
                 '}';

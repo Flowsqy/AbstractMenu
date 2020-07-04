@@ -57,8 +57,7 @@ public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterab
         Objects.requireNonNull(predicate);
 
         links.put(item, new ItemLink(linked, predicate));
-        currentItem = linked;
-        currentEvent = event;
+        setCurrent(linked);
 
         return this;
     }

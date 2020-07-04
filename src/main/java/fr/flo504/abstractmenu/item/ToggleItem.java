@@ -12,8 +12,8 @@ public class ToggleItem extends MultipleItem  {
     }
 
     public final void registerItems(InventorySlot first, InventorySlot second, BiPredicate<Player, ClickType> firstPredicate, BiPredicate<Player, ClickType> secondPredicate){
-        registerItem(second, first, secondPredicate);
-        registerItem(first, second, firstPredicate);
+        registerItem(first, second, secondPredicate);
+        registerItem(second, first, firstPredicate);
     }
 
 }

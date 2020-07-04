@@ -4,4 +4,6 @@ public interface Clickable {
 
     ItemClickEvent getEvent();
 
+    void setEvent(ItemClickEvent event);
+
 }

@@ -37,8 +37,14 @@ public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterab
         return currentItem == null ? null : currentItem.getItem(player);
     }
 
+    @Override
     public ItemClickEvent getEvent() {
         return event;
+    }
+
+    @Override
+    public void setEvent(ItemClickEvent event) {
+        this.currentEvent = event;
     }
 
     public MultipleItem registerItem(InventorySlot item, InventorySlot linked){
@@ -46,23 +52,20 @@ public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterab
     }
 
     public MultipleItem registerItem(InventorySlot item, InventorySlot linked, BiPredicate<Player, ClickType> predicate){
-        return registerItem(item, linked, predicate, null);
-    }
-
-    public MultipleItem registerItem(InventorySlot item, InventorySlot linked, ItemClickEvent event){
-        return registerItem(item, linked, ALWAYS, event);
-    }
-
-    public MultipleItem registerItem(InventorySlot item, InventorySlot linked, BiPredicate<Player, ClickType> predicate, ItemClickEvent event){
         Objects.requireNonNull(item);
         Objects.requireNonNull(linked);
         Objects.requireNonNull(predicate);
 
-        links.put(item, new ItemLink(linked, predicate, event));
+        links.put(item, new ItemLink(linked, predicate));
         currentItem = linked;
         currentEvent = event;
 
         return this;
+    }
+
+    public void setCurrent(InventorySlot slot){
+        currentItem = slot;
+        currentEvent = currentItem instanceof Clickable ? ((Clickable) currentItem).getEvent() : null;
     }
 
     @Override
@@ -109,12 +112,10 @@ public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterab
 
         private InventorySlot item;
         private BiPredicate<Player, ClickType> predicate;
-        private ItemClickEvent event;
 
-        public ItemLink(InventorySlot item, BiPredicate<Player, ClickType> predicate, ItemClickEvent event) {
+        public ItemLink(InventorySlot item, BiPredicate<Player, ClickType> predicate) {
             this.item = item;
             this.predicate = predicate;
-            this.event = event;
         }
 
         public InventorySlot getItem() {
@@ -125,10 +126,6 @@ public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterab
             return predicate;
         }
 
-        public ItemClickEvent getEvent() {
-            return event;
-        }
-
         public void setItem(InventorySlot item) {
             this.item = item;
         }
@@ -137,23 +134,18 @@ public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterab
             this.predicate = predicate;
         }
 
-        public void setEvent(ItemClickEvent event) {
-            this.event = event;
-        }
-
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             ItemLink itemLink = (ItemLink) o;
             return Objects.equals(item, itemLink.item) &&
-                    Objects.equals(predicate, itemLink.predicate) &&
-                    Objects.equals(event, itemLink.event);
+                    Objects.equals(predicate, itemLink.predicate);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(item, predicate, event);
+            return Objects.hash(item, predicate);
         }
 
         @Override
@@ -161,7 +153,6 @@ public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterab
             return "ItemLink{" +
                     "item=" + item +
                     ", predicate=" + predicate +
-                    ", event=" + event +
                     '}';
         }
     }
@@ -174,8 +165,7 @@ public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterab
             final ItemLink itemLink = links.get(currentItem);
             if(itemLink != null) {
                 if (itemLink.getPredicate().test(player, type)) {
-                    currentItem = itemLink.getItem();
-                    currentEvent = itemLink.getEvent();
+                    setCurrent(itemLink.getItem());
                 }
             }
 

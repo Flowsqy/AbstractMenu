@@ -14,7 +14,7 @@ public class ToggleItemParser implements InventorySlotParser {
         Objects.requireNonNull(section);
         Objects.requireNonNull(parserData);
 
-        final ConfigurationSection itemFirstSection = section.getConfigurationSection("one");
+        final ConfigurationSection itemFirstSection = section.getConfigurationSection("first");
         if(itemFirstSection == null)
             return null;
 

@@ -14,37 +14,38 @@ public class ToggleItemParser implements InventorySlotParser {
         Objects.requireNonNull(section);
         Objects.requireNonNull(parserData);
 
-        final ConfigurationSection itemFirstSection = section.getConfigurationSection("first");
-        if(itemFirstSection == null)
+        final ConfigurationSection itemOnSection = section.getConfigurationSection("on");
+        if(itemOnSection == null)
             return null;
 
-        final String itemFirstParserId = itemFirstSection.getString("parser");
-        final InventorySlotParser itemFirstParser = parserData.get(itemFirstParserId);
-        if(itemFirstParser == null)
+        final String itemOnParserId = itemOnSection.getString("parser");
+        final InventorySlotParser itemOnParser = parserData.get(itemOnParserId);
+        if(itemOnParser == null)
             return null;
 
-        final InventorySlot first = itemFirstParser.parse(itemFirstSection, parserData);
-        if(first == null)
+        final InventorySlot on = itemOnParser.parse(itemOnSection, parserData);
+        if(on == null)
             return null;
         
-        final ConfigurationSection itemSecondSection = section.getConfigurationSection("second");
-        if(itemSecondSection == null)
+        final ConfigurationSection itemOffSection = section.getConfigurationSection("off");
+        if(itemOffSection == null)
             return null;
 
-        final String itemSecondParserId = itemSecondSection.getString("parser");
-        final InventorySlotParser itemSecondParser = parserData.get(itemSecondParserId);
-        if(itemSecondParser == null)
+        final String itemOffParserId = itemOffSection.getString("parser");
+        final InventorySlotParser itemOffParser = parserData.get(itemOffParserId);
+        if(itemOffParser == null)
             return null;
 
-        final InventorySlot second = itemSecondParser.parse(itemSecondSection, parserData);
-        if(second == null)
+        final InventorySlot off = itemOffParser.parse(itemOffSection, parserData);
+        if(off == null)
             return null;
         
         final ToggleItem toggleItem = new ToggleItem();
 
         toggleItem.setId(section.getName());
 
-        toggleItem.registerItems(first, second);
+        toggleItem.setOn(on);
+        toggleItem.setOff(off);
 
         return toggleItem;
     }

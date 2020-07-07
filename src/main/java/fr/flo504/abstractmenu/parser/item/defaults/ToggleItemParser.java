@@ -14,7 +14,7 @@ public class ToggleItemParser implements InventorySlotParser {
         Objects.requireNonNull(section);
         Objects.requireNonNull(parserData);
 
-        final ConfigurationSection itemOnSection = section.getConfigurationSection("on");
+        final ConfigurationSection itemOnSection = section.getConfigurationSection("first");
         if(itemOnSection == null)
             return null;
 
@@ -26,8 +26,8 @@ public class ToggleItemParser implements InventorySlotParser {
         final InventorySlot on = itemOnParser.parse(itemOnSection, parserData);
         if(on == null)
             return null;
-        
-        final ConfigurationSection itemOffSection = section.getConfigurationSection("off");
+
+        final ConfigurationSection itemOffSection = section.getConfigurationSection("second");
         if(itemOffSection == null)
             return null;
 
@@ -46,6 +46,7 @@ public class ToggleItemParser implements InventorySlotParser {
 
         toggleItem.setOn(on);
         toggleItem.setOff(off);
+        toggleItem.refresh();
 
         return toggleItem;
     }

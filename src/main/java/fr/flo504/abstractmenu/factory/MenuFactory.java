@@ -1,5 +1,6 @@
 package fr.flo504.abstractmenu.factory;
 
+import fr.flo504.abstractmenu.inventory.AbstractInventory;
 import fr.flo504.abstractmenu.inventory.BaseInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -68,7 +69,9 @@ public final class MenuFactory implements Listener {
     private void onClose(InventoryCloseEvent e) {
         final Inventory inventory = e.getInventory();
 
-        inventories.remove(inventory);
+        final BaseInventory baseInventory = inventories.remove(inventory);
+
+        baseInventory.onClose(e.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

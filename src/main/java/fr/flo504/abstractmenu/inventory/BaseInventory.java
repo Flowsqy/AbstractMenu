@@ -7,6 +7,7 @@ import fr.flo504.abstractmenu.item.ItemClickEvent;
 import fr.flo504.abstractmenu.utils.Cloneable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -145,6 +146,8 @@ public class BaseInventory {
             this.registerSlot((InventorySlot) cloneable.clone(), position);
         }
     }
+
+    public void onClose(HumanEntity player) {}
 
     @Override
     public boolean equals(Object o) {

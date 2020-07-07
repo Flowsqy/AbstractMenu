@@ -71,7 +71,8 @@ public final class MenuFactory implements Listener {
 
         final BaseInventory baseInventory = inventories.remove(inventory);
 
-        baseInventory.onClose(e.getPlayer());
+        if(baseInventory != null)
+            baseInventory.onClose(e.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

@@ -147,7 +147,7 @@ public class BaseInventory {
         }
     }
 
-    public void onClose(HumanEntity player) {}
+    public void onClose(Player player) {}
 
     @Override
     public boolean equals(Object o) {

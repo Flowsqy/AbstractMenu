@@ -71,8 +71,10 @@ public final class MenuFactory implements Listener {
 
         final BaseInventory baseInventory = inventories.remove(inventory);
 
-        if(baseInventory != null)
-            baseInventory.onClose(e.getPlayer());
+        if(baseInventory != null){
+            final Player player = Bukkit.getPlayer(e.getPlayer().getUniqueId());
+            baseInventory.onClose(player);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

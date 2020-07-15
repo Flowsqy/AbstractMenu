@@ -58,7 +58,7 @@ public class BaseInventory {
         return factory;
     }
 
-    public final void open(Player player) {
+    public void open(Player player) {
         final Inventory inventory = Bukkit.createInventory(null, line*9, name);
 
         slots.forEach((key, value) -> inventory.setItem(key, value.getItem(player)));

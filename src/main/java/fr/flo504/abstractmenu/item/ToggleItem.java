@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class ToggleItem implements InventorySlot, Clickable, Cloneable {
 
-    private ItemClickEvent event = new ToggleItemClickEvent();;
+    private ItemClickEvent event = new ToggleItemClickEvent();
 
     private String id;
 
@@ -19,9 +19,7 @@ public class ToggleItem implements InventorySlot, Clickable, Cloneable {
     private boolean mustToggleOnClick = true;
 
     private boolean state;
-    
-    private InventorySlot current;
-            
+
 
     public ToggleItem() {
         event = new ToggleItemClickEvent();
@@ -52,7 +50,6 @@ public class ToggleItem implements InventorySlot, Clickable, Cloneable {
         this.off = toggleItem.off;
         this.mustToggleOnClick = toggleItem.mustToggleOnClick;
         this.state = toggleItem.state;
-        this.current = toggleItem.current;
     }
 
     public InventorySlot getOn() {
@@ -91,10 +88,6 @@ public class ToggleItem implements InventorySlot, Clickable, Cloneable {
         state = !state;
     }
 
-    public void refresh(){
-        current = state ? on : off;
-    }
-
     @Override
     public ItemClickEvent getEvent() {
         return event;
@@ -116,6 +109,7 @@ public class ToggleItem implements InventorySlot, Clickable, Cloneable {
 
     @Override
     public ItemStack getItem(Player player) {
+        final InventorySlot current = state ? on : off;
         return current == null ? null : current.getItem(player);
     }
 
@@ -134,8 +128,7 @@ public class ToggleItem implements InventorySlot, Clickable, Cloneable {
                 Objects.equals(event, that.event) &&
                 Objects.equals(id, that.id) &&
                 Objects.equals(on, that.on) &&
-                Objects.equals(off, that.off) &&
-                Objects.equals(current, that.current);
+                Objects.equals(off, that.off);
     }
 
     @Override
@@ -147,28 +140,26 @@ public class ToggleItem implements InventorySlot, Clickable, Cloneable {
                 ", off=" + off +
                 ", mustToggleOnClick=" + mustToggleOnClick +
                 ", state=" + state +
-                ", current=" + current +
                 '}';
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(event, id, on, off, mustToggleOnClick, state, current);
+        return Objects.hash(event, id, on, off, mustToggleOnClick, state);
     }
 
     private class ToggleItemClickEvent implements ItemClickEvent {
         @Override
         public void onClick(ClickType type, Player player) {
             final ItemClickEvent event;
-            if(current != null && current instanceof Clickable)
+            final InventorySlot current = state ? on : off;
+            if(current instanceof Clickable)
                 event = ((Clickable) current).getEvent();
             else
                 event = null;
 
-            if(mustToggleOnClick) {
+            if(mustToggleOnClick)
                 toggleState();
-                refresh();
-            }
 
             if(event != null)
                 event.onClick(type, player);

@@ -46,7 +46,6 @@ public class ToggleItemParser implements InventorySlotParser {
 
         toggleItem.setOn(on);
         toggleItem.setOff(off);
-        toggleItem.refresh();
 
         return toggleItem;
     }

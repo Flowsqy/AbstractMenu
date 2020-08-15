@@ -1,5 +1,7 @@
 package fr.flo504.abstractmenu.item.defaults;
 
+import fr.flo504.abstractmenu.item.Clickable;
+import fr.flo504.abstractmenu.item.InventorySlot;
 import fr.flo504.abstractmenu.item.ItemClickEvent;
 import fr.flo504.abstractmenu.item.ToggleItem;
 import org.bukkit.entity.Player;
@@ -47,9 +49,13 @@ public class GroupItemClickEvent implements ItemClickEvent{
 
     public static void linkOther(ToggleItem... toggleItems){
         for(ToggleItem item : toggleItems){
-            if(!(item.getEvent() instanceof GroupItemClickEvent))
+            final InventorySlot off = item.getOff();
+            if(!(off instanceof Clickable))
                 continue;
-            ((GroupItemClickEvent) item.getEvent()).registerOther(
+            final ItemClickEvent event = ((Clickable) off).getEvent();
+            if(!(event instanceof GroupItemClickEvent))
+                continue;
+            ((GroupItemClickEvent) event).registerOther(
                     Arrays.stream(toggleItems)
                             .filter(toggleItem -> toggleItem != item)
                             .collect(Collectors.toList())

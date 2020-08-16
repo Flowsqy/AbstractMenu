@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -60,6 +61,19 @@ public class GroupItemClickEvent implements ItemClickEvent{
                             .filter(toggleItem -> toggleItem != item)
                             .collect(Collectors.toList())
             );
+        }
+    }
+
+    public static void toggleCorrect(Predicate<ToggleItem> predicate, ToggleItem... toggleItems){
+        for(ToggleItem item : toggleItems){
+            if(predicate.test(item)){
+                item.setState(true);
+                item.setMustToggleOnClick(false);
+            }
+            else{
+                item.setState(false);
+                item.setMustToggleOnClick(true);
+            }
         }
     }
 

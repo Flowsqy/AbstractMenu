@@ -1,6 +1,5 @@
 package fr.flo504.abstractmenu.factory;
 
-import fr.flo504.abstractmenu.inventory.AbstractInventory;
 import fr.flo504.abstractmenu.inventory.BaseInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -28,18 +27,19 @@ public final class MenuFactory implements Listener {
 
     private final Map<Inventory, BaseInventory> inventories;
 
-    public final void registerInventory(BaseInventory abstractInventory, Inventory inventory) {
-        this.inventories.put(inventory, abstractInventory);
+    public final void registerInventory(BaseInventory customInventory, Inventory inventory) {
+        this.inventories.put(inventory, customInventory);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onClick(InventoryClickEvent e) {
 
-        if(!inventories.containsKey(e.getInventory()))
+        final Inventory inv = e.getInventory();
+
+        if(!inventories.containsKey(inv))
             return;
 
-        final BaseInventory inventory = inventories.get(e.getInventory());
-
+        final BaseInventory inventory = inventories.get(inv);
         final boolean customInventory = e.getClickedInventory() != null && !e.getClickedInventory().equals(e.getWhoClicked().getInventory());
 
         inventory.onClick((Player) e.getWhoClicked(), e.getCurrentItem(), e.getClick(), e.getSlot(), customInventory, e);
@@ -77,7 +77,7 @@ public final class MenuFactory implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onQuit(PlayerQuitEvent e) {
         e.getPlayer().closeInventory();
     }

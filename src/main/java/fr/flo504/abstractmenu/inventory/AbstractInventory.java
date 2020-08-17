@@ -6,7 +6,7 @@ import fr.flo504.abstractmenu.parser.inventory.SlotInfo;
 
 import java.util.List;
 
-public abstract class AbstractInventory extends BaseInventory {
+public abstract class AbstractInventory extends CustomInventory {
 
     public AbstractInventory(InventoryInfo info, MenuFactory factory){
         this(info.getTitle(), info.getLine(), factory, info.getSlots());

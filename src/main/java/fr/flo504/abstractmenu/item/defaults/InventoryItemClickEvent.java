@@ -1,6 +1,6 @@
 package fr.flo504.abstractmenu.item.defaults;
 
-import fr.flo504.abstractmenu.inventory.BaseInventory;
+import fr.flo504.abstractmenu.inventory.CustomInventory;
 import fr.flo504.abstractmenu.item.ItemClickEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -9,9 +9,9 @@ import java.util.Objects;
 
 public class InventoryItemClickEvent implements ItemClickEvent {
 
-    private BaseInventory inventory;
+    private final CustomInventory inventory;
 
-    public InventoryItemClickEvent(BaseInventory inventory) {
+    public InventoryItemClickEvent(CustomInventory inventory) {
         this.inventory = inventory;
     }
 

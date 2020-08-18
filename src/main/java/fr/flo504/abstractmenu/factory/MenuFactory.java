@@ -1,5 +1,6 @@
 package fr.flo504.abstractmenu.factory;
 
+import fr.flo504.abstractmenu.AbstractMenuPlugin;
 import fr.flo504.abstractmenu.inventory.BaseInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,9 +25,15 @@ public final class MenuFactory implements Listener {
     public MenuFactory(Plugin plugin) {
         inventories = new HashMap<>();
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        final AbstractMenuPlugin abstractMenuPlugin = JavaPlugin.getPlugin(AbstractMenuPlugin.class);
+        abstractMenuPlugin.register(plugin, this);
     }
 
     private final Map<Inventory, BaseInventory> inventories;
+
+    public Map<Inventory, BaseInventory> getInventories() {
+        return inventories;
+    }
 
     public final void registerInventory(BaseInventory customInventory, Inventory inventory) {
         this.inventories.put(inventory, customInventory);
@@ -72,8 +80,7 @@ public final class MenuFactory implements Listener {
         final BaseInventory baseInventory = inventories.remove(inventory);
 
         if(baseInventory != null){
-            final Player player = Bukkit.getPlayer(e.getPlayer().getUniqueId());
-            baseInventory.onClose(player);
+            baseInventory.onClose((Player) e.getPlayer());
         }
     }
 

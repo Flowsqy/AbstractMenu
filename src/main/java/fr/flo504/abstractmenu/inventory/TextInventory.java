@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.AnvilInventory;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -63,6 +64,8 @@ public class TextInventory extends BaseInventory{
 
     @Override
     public void onClose(Player player) {
-        player.getOpenInventory().getTopInventory().setItem(0, null);
+        final Inventory inventory = player.getOpenInventory().getTopInventory();
+        inventory.setItem(0, null);
+        inventory.setItem(2, null);
     }
 }

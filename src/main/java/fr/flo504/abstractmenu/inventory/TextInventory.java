@@ -43,10 +43,12 @@ public class TextInventory extends BaseInventory{
 
     public TextInventory(MenuFactory factory, TextInventoryInfo info){
         super(info.getTitle(), factory);
+        this.placeholder = info.getPlaceholder();
     }
 
     public TextInventory(MenuFactory factory, TextInventoryInfo info, BiConsumer<Player, String> callBack){
         super(info.getTitle(), factory);
+        this.placeholder = info.getPlaceholder();
         this.callBack = callBack;
     }
 

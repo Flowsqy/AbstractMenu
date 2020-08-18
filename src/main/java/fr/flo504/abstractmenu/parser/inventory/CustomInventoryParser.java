@@ -1,6 +1,8 @@
 package fr.flo504.abstractmenu.parser.inventory;
 
 import fr.flo504.abstractmenu.item.InventorySlot;
+import fr.flo504.abstractmenu.parser.inventory.data.CustomInventoryInfo;
+import fr.flo504.abstractmenu.parser.inventory.data.SlotInfo;
 import fr.flo504.abstractmenu.parser.item.InventorySlotParser;
 import fr.flo504.abstractmenu.parser.item.ItemParser;
 import org.bukkit.ChatColor;
@@ -9,9 +11,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class InventoryParser {
+public class CustomInventoryParser {
 
-    public static InventoryInfo parseInventory(ConfigurationSection section, Map<String, InventorySlotParser> parserData){
+    public static CustomInventoryInfo parseInventory(ConfigurationSection section, Map<String, InventorySlotParser> parserData){
         Objects.requireNonNull(section);
         Objects.requireNonNull(parserData);
 
@@ -70,7 +72,7 @@ public class InventoryParser {
             }
         }
 
-        return new InventoryInfo(
+        return new CustomInventoryInfo(
                 title,
                 line,
                 slotInfo

@@ -1,5 +1,6 @@
 package fr.flo504.abstractmenu.factory;
 
+import fr.flo504.abstractmenu.AbstractMenuPlugin;
 import fr.flo504.abstractmenu.inventory.BaseInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -13,6 +14,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,22 +25,29 @@ public final class MenuFactory implements Listener {
     public MenuFactory(Plugin plugin) {
         inventories = new HashMap<>();
         Bukkit.getPluginManager().registerEvents(this, plugin);
+        final AbstractMenuPlugin abstractMenuPlugin = JavaPlugin.getPlugin(AbstractMenuPlugin.class);
+        abstractMenuPlugin.register(plugin, this);
     }
 
     private final Map<Inventory, BaseInventory> inventories;
 
-    public final void registerInventory(BaseInventory abstractInventory, Inventory inventory) {
-        this.inventories.put(inventory, abstractInventory);
+    public Map<Inventory, BaseInventory> getInventories() {
+        return inventories;
+    }
+
+    public final void registerInventory(BaseInventory customInventory, Inventory inventory) {
+        this.inventories.put(inventory, customInventory);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     private void onClick(InventoryClickEvent e) {
 
-        if(!inventories.containsKey(e.getInventory()))
+        final Inventory inv = e.getInventory();
+
+        if(!inventories.containsKey(inv))
             return;
 
-        final BaseInventory inventory = inventories.get(e.getInventory());
-
+        final BaseInventory inventory = inventories.get(inv);
         final boolean customInventory = e.getClickedInventory() != null && !e.getClickedInventory().equals(e.getWhoClicked().getInventory());
 
         inventory.onClick((Player) e.getWhoClicked(), e.getCurrentItem(), e.getClick(), e.getSlot(), customInventory, e);
@@ -68,10 +77,14 @@ public final class MenuFactory implements Listener {
     private void onClose(InventoryCloseEvent e) {
         final Inventory inventory = e.getInventory();
 
-        inventories.remove(inventory);
+        final BaseInventory baseInventory = inventories.remove(inventory);
+
+        if(baseInventory != null){
+            baseInventory.onClose((Player) e.getPlayer());
+        }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.MONITOR)
     private void onQuit(PlayerQuitEvent e) {
         e.getPlayer().closeInventory();
     }

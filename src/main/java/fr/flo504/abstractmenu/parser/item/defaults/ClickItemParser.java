@@ -1,6 +1,6 @@
 package fr.flo504.abstractmenu.parser.item.defaults;
 
-import fr.flo504.abstractmenu.item.SlotItem;
+import fr.flo504.abstractmenu.item.ClickableItem;
 import fr.flo504.abstractmenu.parser.item.InventorySlotParser;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -11,9 +11,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class SlotItemParser implements InventorySlotParser {
+public class ClickItemParser implements InventorySlotParser {
     @Override
-    public SlotItem parse(ConfigurationSection section, Map<String, InventorySlotParser> parserData) {
+    public ClickableItem parse(ConfigurationSection section, Map<String, InventorySlotParser> parserData) {
         Objects.requireNonNull(section);
         Objects.requireNonNull(parserData);
 
@@ -44,7 +44,7 @@ public class SlotItemParser implements InventorySlotParser {
         final int amount = section.getInt("amount", 0);
         final boolean glow = section.getBoolean("glow", false);
 
-        return new SlotItem(
+        return new ClickableItem(
                 id,
                 name,
                 material,

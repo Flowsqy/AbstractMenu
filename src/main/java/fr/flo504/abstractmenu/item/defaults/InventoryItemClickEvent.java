@@ -1,17 +1,17 @@
 package fr.flo504.abstractmenu.item.defaults;
 
-import fr.flo504.abstractmenu.inventory.BaseInventory;
+import fr.flo504.abstractmenu.inventory.CustomInventory;
 import fr.flo504.abstractmenu.item.ItemClickEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
 import java.util.Objects;
 
-public class InventoryItem implements ItemClickEvent {
+public class InventoryItemClickEvent implements ItemClickEvent {
 
-    private BaseInventory inventory;
+    private final CustomInventory inventory;
 
-    public InventoryItem(BaseInventory inventory) {
+    public InventoryItemClickEvent(CustomInventory inventory) {
         this.inventory = inventory;
     }
 
@@ -26,7 +26,7 @@ public class InventoryItem implements ItemClickEvent {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        InventoryItem that = (InventoryItem) o;
+        InventoryItemClickEvent that = (InventoryItemClickEvent) o;
         return Objects.equals(inventory, that.inventory);
     }
 

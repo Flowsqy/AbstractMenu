@@ -5,6 +5,8 @@ import org.bukkit.inventory.ItemStack;
 
 public interface InventorySlot {
 
+    String getId();
+
     ItemStack getItem(Player player);
 
 }

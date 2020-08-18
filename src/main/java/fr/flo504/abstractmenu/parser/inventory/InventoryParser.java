@@ -1,5 +1,6 @@
 package fr.flo504.abstractmenu.parser.inventory;
 
+import fr.flo504.abstractmenu.item.InventorySlot;
 import fr.flo504.abstractmenu.parser.item.InventorySlotParser;
 import fr.flo504.abstractmenu.parser.item.ItemParser;
 import org.bukkit.ChatColor;
@@ -55,9 +56,9 @@ public class InventoryParser {
                 if(!itemKey.isPresent())
                     continue;
 
-                final InventorySlotParser.ItemData info = ItemParser.parseItem(slotSection.getConfigurationSection(itemKey.get()), parser, parserData);
+                final InventorySlot info = ItemParser.parseItem(slotSection.getConfigurationSection(itemKey.get()), parser, parserData);
 
-                if(info == null || info.getItem() == null)
+                if(info == null)
                     continue;
 
                 slotInfo.add(

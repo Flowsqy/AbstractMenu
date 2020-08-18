@@ -12,25 +12,14 @@ import java.util.Objects;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
-public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entry<InventorySlot, MultipleItem.ItemLink>> {
+public class MultipleItem implements InventorySlot, Clickable, Cloneable, Iterable<Map.Entry<InventorySlot, MultipleItem.ItemLink>> {
 
     protected final static BiPredicate<Player, ClickType> ALWAYS = (player, clickType) -> true;
 
     private final Map<InventorySlot, ItemLink> links;
-    private final ItemClickEvent event = new ItemClickEvent() {
-        @Override
-        public void onClick(ClickType type, Player player) {
-            final ItemClickEvent clicked = currentEvent;
-            final ItemLink itemLink = links.get(currentItem);
-            if(itemLink != null)
-                if(itemLink.getPredicate().test(player, type)){
-                    currentItem = itemLink.getItem();
-                    currentEvent = itemLink.getEvent();
-                }
+    private final ItemClickEvent event = new MultipleItemClickEvent();
 
-            clicked.onClick(type, player);
-        }
-    };
+    private String id;
 
     private InventorySlot currentItem;
     private ItemClickEvent currentEvent;
@@ -40,9 +29,19 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
     }
 
     private MultipleItem(MultipleItem item){
+        this.id = item.id;
         this.links = new HashMap<>(item.links);
         this.currentItem = item.currentItem;
         this.currentEvent = item.currentEvent;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     @Override
@@ -50,8 +49,14 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
         return currentItem == null ? null : currentItem.getItem(player);
     }
 
+    @Override
     public ItemClickEvent getEvent() {
         return event;
+    }
+
+    @Override
+    public void setEvent(ItemClickEvent event) {
+        this.currentEvent = event;
     }
 
     public MultipleItem registerItem(InventorySlot item, InventorySlot linked){
@@ -59,22 +64,19 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
     }
 
     public MultipleItem registerItem(InventorySlot item, InventorySlot linked, BiPredicate<Player, ClickType> predicate){
-        return registerItem(item, linked, predicate, null);
-    }
-
-    public MultipleItem registerItem(InventorySlot item, InventorySlot linked, ItemClickEvent event){
-        return registerItem(item, linked, ALWAYS, event);
-    }
-
-    public MultipleItem registerItem(InventorySlot item, InventorySlot linked, BiPredicate<Player, ClickType> predicate, ItemClickEvent event){
         Objects.requireNonNull(item);
         Objects.requireNonNull(linked);
         Objects.requireNonNull(predicate);
 
-        links.put(item, new ItemLink(linked, predicate, event));
-        currentItem = item;
+        links.put(item, new ItemLink(linked, predicate));
+        setCurrent(linked);
 
         return this;
+    }
+
+    public void setCurrent(InventorySlot slot){
+        currentItem = slot;
+        currentEvent = currentItem instanceof Clickable ? ((Clickable) currentItem).getEvent() : null;
     }
 
     @Override
@@ -97,14 +99,15 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
         if (o == null || getClass() != o.getClass()) return false;
         MultipleItem that = (MultipleItem) o;
         return links.equals(that.links) &&
-                event.equals(that.event) &&
+                Objects.equals(event, that.event) &&
+                Objects.equals(id, that.id) &&
                 Objects.equals(currentItem, that.currentItem) &&
                 Objects.equals(currentEvent, that.currentEvent);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(links, event, currentItem, currentEvent);
+        return Objects.hash(links, event, id, currentItem, currentEvent);
     }
 
     @Override
@@ -112,6 +115,7 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
         return "MultipleItem{" +
                 "links=" + links +
                 ", event=" + event +
+                ", id='" + id + '\'' +
                 ", currentItem=" + currentItem +
                 ", currentEvent=" + currentEvent +
                 '}';
@@ -119,14 +123,12 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
 
     public static final class ItemLink {
 
-        private final InventorySlot item;
-        private final BiPredicate<Player, ClickType> predicate;
-        private final ItemClickEvent event;
+        private InventorySlot item;
+        private BiPredicate<Player, ClickType> predicate;
 
-        public ItemLink(InventorySlot item, BiPredicate<Player, ClickType> predicate, ItemClickEvent event) {
+        public ItemLink(InventorySlot item, BiPredicate<Player, ClickType> predicate) {
             this.item = item;
             this.predicate = predicate;
-            this.event = event;
         }
 
         public InventorySlot getItem() {
@@ -137,8 +139,12 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
             return predicate;
         }
 
-        public ItemClickEvent getEvent() {
-            return event;
+        public void setItem(InventorySlot item) {
+            this.item = item;
+        }
+
+        public void setPredicate(BiPredicate<Player, ClickType> predicate) {
+            this.predicate = predicate;
         }
 
         @Override
@@ -147,13 +153,12 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
             if (o == null || getClass() != o.getClass()) return false;
             ItemLink itemLink = (ItemLink) o;
             return Objects.equals(item, itemLink.item) &&
-                    Objects.equals(predicate, itemLink.predicate) &&
-                    Objects.equals(event, itemLink.event);
+                    Objects.equals(predicate, itemLink.predicate);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(item, predicate, event);
+            return Objects.hash(item, predicate);
         }
 
         @Override
@@ -161,9 +166,27 @@ public class MultipleItem implements InventorySlot, Cloneable, Iterable<Map.Entr
             return "ItemLink{" +
                     "item=" + item +
                     ", predicate=" + predicate +
-                    ", event=" + event +
                     '}';
         }
+    }
+
+    private final class MultipleItemClickEvent implements ItemClickEvent {
+
+        @Override
+        public void onClick(ClickType type, Player player) {
+            final ItemClickEvent clicked = currentEvent;
+            final ItemLink itemLink = links.get(currentItem);
+            if(itemLink != null) {
+                if (itemLink.getPredicate().test(player, type)) {
+                    setCurrent(itemLink.getItem());
+                }
+            }
+
+            if(clicked != null)
+                clicked.onClick(type, player);
+
+        }
+
     }
 
 }

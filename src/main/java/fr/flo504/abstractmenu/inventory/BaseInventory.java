@@ -1,39 +1,27 @@
 package fr.flo504.abstractmenu.inventory;
 
 import fr.flo504.abstractmenu.factory.MenuFactory;
-import fr.flo504.abstractmenu.item.InventorySlot;
-import fr.flo504.abstractmenu.item.ItemClickEvent;
-import fr.flo504.abstractmenu.utils.Cloneable;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.Objects;
 
-public class BaseInventory {
+public abstract class BaseInventory {
 
-    private String name;
-    private int line;
+    protected String name;
+    protected final MenuFactory factory;
 
-    private final MenuFactory factory;
-
-    private final Map<Integer, InventorySlot> slots = new HashMap<>();
-    private final Map<Integer, ItemClickEvent> events = new HashMap<>();
-
-    public BaseInventory(String name, int line, MenuFactory factory) {
+    public BaseInventory(String name, MenuFactory factory) {
         Objects.requireNonNull(factory);
         this.name = formatTitle(name);
-        this.line = line;
         this.factory = factory;
     }
 
     protected String formatTitle(String title){
-        return ChatColor.RESET + title;
+        return ChatColor.RESET + ChatColor.WHITE.toString() + title;
     }
 
     public String getName() {
@@ -44,141 +32,21 @@ public class BaseInventory {
         this.name = formatTitle(name);
     }
 
-    public int getLine() {
-        return line;
-    }
-
-    public void setLine(int line) {
-        this.line = line;
-    }
-
     public MenuFactory getFactory() {
         return factory;
     }
 
-    public final void open(Player player) {
-        final Inventory inventory = Bukkit.createInventory(null, line*9, name);
-
-        slots.forEach((key, value) -> inventory.setItem(key, value.getItem(player)));
-
-        factory.registerInventory(this, inventory);
-        player.openInventory(inventory);
-    }
-
-    public final void update(Player player) {
-        if(player == null)
-            return;
-
-        final InventoryView openInventory = player.getOpenInventory();
-        final Inventory inventory = openInventory.getTopInventory();
-
-        if(!openInventory.getTitle().equals(name) || inventory.getSize()/9 != line)
-            return;
-
-        slots.forEach((key, value) -> {
-            final ItemStack itemStack = value.getItem(player);
-            final ItemStack current = openInventory.getItem(key);
-            if(current == null || !current.equals(itemStack))
-                inventory.setItem(key, itemStack);
-        });
-
-    }
+    public abstract void open(Player player);
 
     public void onClick(Player player, ItemStack item, ClickType clickType, int slot, boolean customInventory, InventoryClickEvent e) {
-
         if (!customInventory){
             if (!(clickType.equals(ClickType.DOUBLE_CLICK) || e.isShiftClick()))
                 return;
         }
 
         e.setCancelled(true);
-
-        if(item == null)
-            return;
-
-        final ItemClickEvent event = events.get(slot);
-
-        if(event == null)
-            return;
-
-        event.onClick(clickType, player);
-
     }
 
-    public final Map<Integer, InventorySlot> getItems(){
-        return this.slots;
-    }
-    public final Map<Integer, ItemClickEvent> getEvents() {
-        return this.events;
-    }
+    public abstract void onClose(Player player);
 
-    public final Set<Integer> getSlots(){
-        return this.slots.keySet();
-    }
-
-    public final void registerSlot(InventorySlot inventorySlot, int position, ItemClickEvent event) {
-
-        if(position >= (this.line*9))
-            throw new UnsupportedOperationException("The inventory doesn't contain the slot " + position);
-
-        this.slots.put(position, inventorySlot);
-        if(event != null)
-            this.events.put(position, event);
-    }
-
-    public final void registerSlot(InventorySlot inventorySlot, List<Integer> positions, ItemClickEvent event) {
-        for(int position : positions)
-            this.registerSlot(inventorySlot, position, event);
-    }
-
-    public final void registerIndependentSlot(InventorySlot inventorySlot, List<Integer> positions, ItemClickEvent event) {
-        if(!(inventorySlot instanceof Cloneable)) {
-            registerSlot(inventorySlot, positions, event);
-            return;
-        }
-        final Cloneable cloneable = (Cloneable)inventorySlot;
-        for(int position : positions) {
-            this.registerSlot((InventorySlot) cloneable.clone(), position, event);
-        }
-    }
-
-    public final void registerSlot(InventorySlot inventorySlot, int position) {
-        registerSlot(inventorySlot, position, null);
-    }
-
-    public final void registerSlot(InventorySlot inventorySlot, List<Integer> positions) {
-        registerSlot(inventorySlot, positions, null);
-    }
-
-    public final void registerIndependentSlot(InventorySlot inventorySlot, List<Integer> positions) {
-        registerIndependentSlot(inventorySlot, positions, null);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        BaseInventory that = (BaseInventory) o;
-        return line == that.line &&
-                Objects.equals(name, that.name) &&
-                factory.equals(that.factory) &&
-                slots.equals(that.slots) &&
-                events.equals(that.events);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, line, factory, slots, events);
-    }
-
-    @Override
-    public String toString() {
-        return "BaseInventory{" +
-                "name='" + name + '\'' +
-                ", line=" + line +
-                ", factory=" + factory +
-                ", slots=" + slots +
-                ", events=" + events +
-                '}';
-    }
 }

@@ -1,4 +1,4 @@
-package fr.flo504.abstractmenu.parser.inventory;
+package fr.flo504.abstractmenu.parser.inventory.data;
 
 import fr.flo504.abstractmenu.item.InventorySlot;
 

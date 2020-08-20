@@ -13,7 +13,7 @@ public class HeadUtils {
     private static final Field profileField;
 
     static {
-        final Class<?> cSkullMetaClass = Reflect.getClass(Reflect.NMS.CRAFTBUKKIT+"inventory.CraftMetaSkull");
+        final Class<?> cSkullMetaClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT+"inventory.CraftMetaSkull");
         profileField = Reflect.getField(cSkullMetaClass, "profile");
         profileField.setAccessible(true);
     }

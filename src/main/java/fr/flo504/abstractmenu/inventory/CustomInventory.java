@@ -13,10 +13,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class CustomInventory extends BaseInventory{
 
@@ -123,6 +120,27 @@ public class CustomInventory extends BaseInventory{
 
     public void onClose(Player player) {}
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomInventory that = (CustomInventory) o;
+        return line == that.line &&
+                slots.equals(that.slots) &&
+                events.equals(that.events);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(line, slots, events);
+    }
 
+    @Override
+    public String toString() {
+        return "CustomInventory{" +
+                "line=" + line +
+                ", slots=" + slots +
+                ", events=" + events +
+                "} " + super.toString();
+    }
 }

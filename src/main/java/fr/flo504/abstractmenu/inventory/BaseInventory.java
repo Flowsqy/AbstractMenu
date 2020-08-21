@@ -49,4 +49,25 @@ public abstract class BaseInventory {
 
     public abstract void onClose(Player player);
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BaseInventory that = (BaseInventory) o;
+        return Objects.equals(name, that.name) &&
+                factory.equals(that.factory);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, factory);
+    }
+
+    @Override
+    public String toString() {
+        return "BaseInventory{" +
+                "name='" + name + '\'' +
+                ", factory=" + factory +
+                '}';
+    }
 }

@@ -20,6 +20,7 @@ public class TextInventory extends BaseInventory{
 
     private String placeholder;
     private BiConsumer<Player, String> callBack;
+    private Consumer<Player> closeCallback;
 
     public TextInventory(String name, MenuFactory factory) {
         super(name, factory);
@@ -68,6 +69,14 @@ public class TextInventory extends BaseInventory{
         this.callBack = callBack;
     }
 
+    public Consumer<Player> getCloseCallback() {
+        return closeCallback;
+    }
+
+    public void setCloseCallback(Consumer<Player> closeCallback) {
+        this.closeCallback = closeCallback;
+    }
+
     @Override
     public void open(Player player) {
         final AnvilInventory inventory = InventoryAnvil.create(name, player);
@@ -104,5 +113,31 @@ public class TextInventory extends BaseInventory{
         final Inventory inventory = player.getOpenInventory().getTopInventory();
         inventory.setItem(0, null);
         inventory.setItem(2, null);
+        if(closeCallback != null)
+            closeCallback.accept(player);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TextInventory that = (TextInventory) o;
+        return Objects.equals(placeholder, that.placeholder) &&
+                Objects.equals(callBack, that.callBack) &&
+                Objects.equals(closeCallback, that.closeCallback);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(placeholder, callBack, closeCallback);
+    }
+
+    @Override
+    public String toString() {
+        return "TextInventory{" +
+                "placeholder='" + placeholder + '\'' +
+                ", callBack=" + callBack +
+                ", closeCallback=" + closeCallback +
+                "} " + super.toString();
     }
 }

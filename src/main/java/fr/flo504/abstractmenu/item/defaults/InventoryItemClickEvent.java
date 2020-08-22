@@ -1,5 +1,6 @@
 package fr.flo504.abstractmenu.item.defaults;
 
+import fr.flo504.abstractmenu.inventory.BaseInventory;
 import fr.flo504.abstractmenu.inventory.CustomInventory;
 import fr.flo504.abstractmenu.item.ItemClickEvent;
 import fr.flo504.abstractmenu.utils.Cloneable;
@@ -10,14 +11,18 @@ import java.util.Objects;
 
 public class InventoryItemClickEvent implements ItemClickEvent, Cloneable {
 
-    private final CustomInventory inventory;
+    private final BaseInventory inventory;
 
-    public InventoryItemClickEvent(CustomInventory inventory) {
+    public InventoryItemClickEvent(BaseInventory inventory) {
         this.inventory = inventory;
     }
 
     private InventoryItemClickEvent(InventoryItemClickEvent event){
         this.inventory = event.inventory;
+    }
+
+    public BaseInventory getInventory() {
+        return inventory;
     }
 
     @Override

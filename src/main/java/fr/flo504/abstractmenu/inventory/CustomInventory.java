@@ -15,12 +15,12 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class CustomInventory extends BaseInventory{
+public class CustomInventory extends BaseInventory {
 
-    private int line;
+    private final int line;
 
-    private final Map<Integer, InventorySlot> slots = new HashMap<>();
-    private final Map<Integer, ItemClickEvent> events = new HashMap<>();
+    protected final Map<Integer, InventorySlot> slots = new HashMap<>();
+    protected final Map<Integer, ItemClickEvent> events = new HashMap<>();
 
     public CustomInventory(String name, int line, MenuFactory factory) {
         super(name, factory);
@@ -29,10 +29,6 @@ public class CustomInventory extends BaseInventory{
 
     public int getLine() {
         return line;
-    }
-
-    public void setLine(int line) {
-        this.line = line;
     }
 
     public void open(Player player) {
@@ -44,7 +40,7 @@ public class CustomInventory extends BaseInventory{
         player.openInventory(inventory);
     }
 
-    public final void update(Player player) {
+    public void update(Player player) {
         if(player == null)
             return;
 

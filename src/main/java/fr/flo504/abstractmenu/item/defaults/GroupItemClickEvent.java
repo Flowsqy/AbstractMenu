@@ -4,6 +4,7 @@ import fr.flo504.abstractmenu.item.Clickable;
 import fr.flo504.abstractmenu.item.InventorySlot;
 import fr.flo504.abstractmenu.item.ItemClickEvent;
 import fr.flo504.abstractmenu.item.ToggleItem;
+import fr.flo504.abstractmenu.utils.Cloneable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
@@ -12,12 +13,16 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
-public class GroupItemClickEvent implements ItemClickEvent{
+public class GroupItemClickEvent implements ItemClickEvent, Cloneable {
     private final ToggleItem item;
     private final List<ToggleItem> other = new ArrayList<>();
 
     public GroupItemClickEvent(ToggleItem item) {
         this.item = item;
+    }
+
+    private GroupItemClickEvent(GroupItemClickEvent event){
+        this.item = event.item.clone();
     }
 
     public ToggleItem getItem() {
@@ -77,4 +82,8 @@ public class GroupItemClickEvent implements ItemClickEvent{
         }
     }
 
+    @Override
+    public GroupItemClickEvent clone() {
+        return new GroupItemClickEvent(this);
+    }
 }

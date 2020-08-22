@@ -2,17 +2,22 @@ package fr.flo504.abstractmenu.item.defaults;
 
 import fr.flo504.abstractmenu.inventory.CustomInventory;
 import fr.flo504.abstractmenu.item.ItemClickEvent;
+import fr.flo504.abstractmenu.utils.Cloneable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 
 import java.util.Objects;
 
-public class InventoryItemClickEvent implements ItemClickEvent {
+public class InventoryItemClickEvent implements ItemClickEvent, Cloneable {
 
     private final CustomInventory inventory;
 
     public InventoryItemClickEvent(CustomInventory inventory) {
         this.inventory = inventory;
+    }
+
+    private InventoryItemClickEvent(InventoryItemClickEvent event){
+        this.inventory = event.inventory;
     }
 
     @Override
@@ -21,6 +26,10 @@ public class InventoryItemClickEvent implements ItemClickEvent {
             inventory.open(player);
     }
 
+    @Override
+    public InventoryItemClickEvent clone() {
+        return new InventoryItemClickEvent(this);
+    }
 
     @Override
     public boolean equals(Object o) {

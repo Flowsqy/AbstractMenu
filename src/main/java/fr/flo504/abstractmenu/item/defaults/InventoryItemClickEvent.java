@@ -51,7 +51,7 @@ public class InventoryItemClickEvent implements ItemClickEvent, Cloneable {
 
     @Override
     public String toString() {
-        return "InventoryItem{" +
+        return "InventoryItemClickEvent{" +
                 "inventory=" + inventory +
                 '}';
     }

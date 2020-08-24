@@ -54,6 +54,10 @@ public class GroupItemClickEvent implements ItemClickEvent, Cloneable {
     }
 
     public static void linkOther(ToggleItem... toggleItems){
+        linkOther(Arrays.asList(toggleItems));
+    }
+
+    public static void linkOther(List<ToggleItem> toggleItems){
         for(ToggleItem item : toggleItems){
             final InventorySlot off = item.getOff();
             if(!(off instanceof Clickable))
@@ -62,14 +66,18 @@ public class GroupItemClickEvent implements ItemClickEvent, Cloneable {
             if(!(event instanceof GroupItemClickEvent))
                 continue;
             ((GroupItemClickEvent) event).registerOther(
-                    Arrays.stream(toggleItems)
+                    toggleItems.stream()
                             .filter(toggleItem -> toggleItem != item)
                             .collect(Collectors.toList())
             );
         }
     }
 
-    public static void toggleCorrect(Predicate<ToggleItem> predicate, ToggleItem... toggleItems){
+    public static void toggleCorrect(Predicate<ToggleItem> predicate, ToggleItem... toggleItems) {
+        toggleCorrect(predicate, Arrays.asList(toggleItems));
+    }
+
+    public static void toggleCorrect(Predicate<ToggleItem> predicate, List<ToggleItem> toggleItems){
         for(ToggleItem item : toggleItems){
             if(predicate.test(item)){
                 item.setState(true);

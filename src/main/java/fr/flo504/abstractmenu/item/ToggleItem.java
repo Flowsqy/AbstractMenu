@@ -21,9 +21,7 @@ public class ToggleItem implements InventorySlot, Clickable, Cloneable {
     private boolean state;
 
 
-    public ToggleItem() {
-        event = new ToggleItemClickEvent();
-    }
+    public ToggleItem() {}
 
     public ToggleItem(String id) {
         this.id = id;

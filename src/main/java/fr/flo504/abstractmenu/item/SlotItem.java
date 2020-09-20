@@ -32,6 +32,11 @@ public class SlotItem extends BaseItem implements InventorySlot {
         this.itemSlotFunction = itemSlotFunction;
     }
 
+    protected SlotItem(SlotItem item){
+        super(item);
+        this.itemSlotFunction = item.itemSlotFunction;
+    }
+
     public Function<Player, ItemStack> getItemSlotFunction() {
         return itemSlotFunction;
     }
@@ -43,6 +48,11 @@ public class SlotItem extends BaseItem implements InventorySlot {
     @Override
     public ItemStack getItem(Player player) {
         return itemSlotFunction == null ? getItem() : itemSlotFunction.apply(player);
+    }
+
+    @Override
+    public SlotItem clone() {
+        return new SlotItem(this);
     }
 
     @Override

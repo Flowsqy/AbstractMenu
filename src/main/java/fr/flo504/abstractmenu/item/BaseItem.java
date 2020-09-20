@@ -56,7 +56,7 @@ public class BaseItem implements Cloneable {
         this.create();
     }
 
-    private BaseItem(BaseItem item){
+    protected BaseItem(BaseItem item){
         this(
                 item.getId(),
                 item.getName(),

@@ -1,7 +1,6 @@
 package fr.flo504.abstractmenu.item.defaults;
 
 import fr.flo504.abstractmenu.inventory.BaseInventory;
-import fr.flo504.abstractmenu.inventory.CustomInventory;
 import fr.flo504.abstractmenu.item.ItemClickEvent;
 import fr.flo504.abstractmenu.utils.Cloneable;
 import org.bukkit.entity.Player;

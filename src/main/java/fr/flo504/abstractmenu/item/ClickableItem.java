@@ -1,5 +1,6 @@
 package fr.flo504.abstractmenu.item;
 
+import fr.flo504.abstractmenu.utils.Cloneable;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -48,12 +49,22 @@ public class ClickableItem extends SlotItem implements Clickable {
         this.event = event;
     }
 
+    protected ClickableItem(ClickableItem item) {
+        super(item);
+        this.event = item.event instanceof Cloneable ? (ItemClickEvent) ((Cloneable) item.event).clone() : item.event;
+    }
+
     public ItemClickEvent getEvent() {
         return event;
     }
 
     public void setEvent(ItemClickEvent event) {
         this.event = event;
+    }
+
+    @Override
+    public ClickableItem clone() {
+        return new ClickableItem(this);
     }
 
     @Override

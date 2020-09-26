@@ -8,6 +8,10 @@ import java.util.List;
 
 public abstract class AbstractInventory extends CustomInventory {
 
+    public AbstractInventory(String name, int line, MenuFactory factory) {
+        super(name, line, factory);
+    }
+
     public AbstractInventory(CustomInventoryInfo info, MenuFactory factory){
         this(info.getTitle(), info.getLine(), factory, info.getSlots());
     }

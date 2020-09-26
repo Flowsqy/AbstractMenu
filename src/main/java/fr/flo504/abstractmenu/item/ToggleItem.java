@@ -20,7 +20,6 @@ public class ToggleItem implements InventorySlot, Clickable, Cloneable {
 
     private boolean state;
 
-
     public ToggleItem() {}
 
     public ToggleItem(String id) {
@@ -44,8 +43,8 @@ public class ToggleItem implements InventorySlot, Clickable, Cloneable {
         if(!(toggleItem.event instanceof ToggleItemClickEvent))
             this.event = toggleItem.event;
         this.id = toggleItem.id;
-        this.on = toggleItem.on instanceof Cloneable ? (InventorySlot) ((Cloneable) toggleItem.on).clone() : toggleItem.on;
-        this.off = toggleItem.off instanceof Cloneable ? (InventorySlot) ((Cloneable) toggleItem.off).clone() : toggleItem.off;
+        this.on = toggleItem.on;
+        this.off = toggleItem.off;
         this.mustToggleOnClick = toggleItem.mustToggleOnClick;
         this.state = toggleItem.state;
     }

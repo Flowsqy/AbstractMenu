@@ -1,7 +1,6 @@
 package fr.flo504.abstractmenu.inventory;
 
 import fr.flo504.abstractmenu.factory.MenuFactory;
-import fr.flo504.abstractmenu.inventory.BaseInventory;
 import fr.flo504.abstractmenu.item.Clickable;
 import fr.flo504.abstractmenu.item.InventorySlot;
 import fr.flo504.abstractmenu.item.ItemClickEvent;
@@ -27,7 +26,6 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
     private final Map<Integer, InventorySlot> slots = new HashMap<>();
     private BiPredicate<ToggleItem, T> groupPredicate;
     private final List<Integer> groupSlots = new ArrayList<>();
-    private final Map<K, ToggleGroup> groups = new HashMap<>();
 
     private final Map<K, SelectData<T>> sessions = new HashMap<>();
     private final Map<String, K> players = new HashMap<>();
@@ -61,7 +59,8 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
     public void open(Player player, K key, T initData){
         SelectData<T> session = sessions.get(key);
         if(session == null) {
-            session = new SelectData<>();
+            final ToggleGroup<T> group = new ToggleGroup<>(groupPredicate);
+            session = new SelectData<>(group);
             for(Map.Entry<Integer, InventorySlot> entrySlot : slots.entrySet()){
                 final int position = entrySlot.getKey();
                 InventorySlot slot = entrySlot.getValue();
@@ -69,7 +68,6 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
                     slot = (InventorySlot) ((Cloneable) slot).clone();
                 session.slots.put(position, slot);
             }
-            final ToggleGroup group = new ToggleGroup(groupPredicate);
             for(Map.Entry<Integer, InventorySlot> entrySlot : session.slots.entrySet()){
                 final int position = entrySlot.getKey();
                 InventorySlot slot = entrySlot.getValue();
@@ -84,7 +82,6 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
             GroupItemClickEvent.linkOther(group.getItems());
             if(group.getPredicate() != null)
                 GroupItemClickEvent.toggleCorrect(item -> group.getPredicate().test(item, initData), group.getItems());
-            groups.put(key, group);
         }
         session.getActives().add(player);
 
@@ -155,26 +152,24 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
     public void refresh(K key){
         if(key == null)
             return;
-        final ToggleGroup group = groups.get(key);
-        if(group == null)
-            return;
-
-        if(group.getPredicate() == null)
-            return;
 
         final SelectData<T> selectData = sessions.get(key);
         if(selectData == null)
             return;
 
         final T data = selectData.getData();
+        final ToggleGroup<T> group = selectData.getGroup();
 
         GroupItemClickEvent.toggleCorrect(item -> group.getPredicate().test(item, data), group.getItems());
     }
 
-    public ToggleGroup getGroup(K key){
+    public ToggleGroup<T> getGroup(K key){
         if(key == null)
             return null;
-        return groups.get(key);
+        final SelectData<T> data = sessions.get(key);
+        if(data == null)
+            return null;
+        return data.getGroup();
     }
 
     public void registerGroup(BiPredicate<ToggleItem, T> predicate, Integer... slots){
@@ -260,7 +255,6 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
             onClose(player);
 
         sessions.remove(key);
-        groups.remove(key);
     }
 
     public final void registerSlot(InventorySlot inventorySlot, int position) {
@@ -287,21 +281,22 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
         }
     }
 
-
-
     public final static class SelectData<T> {
 
         private T data;
         private final List<Player> actives = new ArrayList<>();
+        private final ToggleGroup<T> group;
 
         private final Map<Integer, InventorySlot> slots = new HashMap<>();
         private final Map<Integer, ItemClickEvent> events = new HashMap<>();
 
-        public SelectData() {
+        public SelectData(ToggleGroup<T> group) {
+            this.group = group;
         }
 
-        public SelectData(T data) {
+        public SelectData(T data, ToggleGroup<T> group) {
             this.data = data;
+            this.group = group;
         }
 
         public T getData() {
@@ -314,6 +309,10 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
 
         public List<Player> getActives() {
             return actives;
+        }
+
+        public ToggleGroup<T> getGroup() {
+            return group;
         }
 
         @Override
@@ -337,13 +336,14 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
             return "SelectData{" +
                     "data=" + data +
                     ", actives=" + actives +
+                    ", group=" + group +
                     ", slots=" + slots +
                     ", events=" + events +
                     '}';
         }
     }
 
-    public final class ToggleGroup implements Cloneable{
+    public final static class ToggleGroup<T> implements Cloneable{
 
         private final List<ToggleItem> items = new ArrayList<>();
         private final BiPredicate<ToggleItem, T> predicate;
@@ -352,7 +352,7 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
             this.predicate = predicate;
         }
 
-        private ToggleGroup(ToggleGroup group){
+        private ToggleGroup(ToggleGroup<T> group){
             group.items.stream().map(ToggleItem::clone).forEach(items::add);
             this.predicate = group.predicate;
         }
@@ -369,7 +369,7 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            ToggleGroup group = (ToggleGroup) o;
+            ToggleGroup<?> group = (ToggleGroup<?>) o;
             return items.equals(group.items) &&
                     Objects.equals(predicate, group.predicate);
         }
@@ -388,8 +388,8 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
         }
 
         @Override
-        public ToggleGroup clone() {
-            return new ToggleGroup(this);
+        public ToggleGroup<T> clone() {
+            return new ToggleGroup<>(this);
         }
     }
 

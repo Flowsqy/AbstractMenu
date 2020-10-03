@@ -92,7 +92,7 @@ public abstract class SelectInventory<T, K> extends BaseInventory {
 
         session.slots.forEach((slotKey, value) -> inventory.setItem(slotKey, value.getItem(player)));
 
-        getFactory().registerInventory(this, inventory);
+        factory.registerInventory(this, inventory);
         player.openInventory(inventory);
     }
 

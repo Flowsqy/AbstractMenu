@@ -36,8 +36,6 @@ public abstract class BaseInventory {
         return factory;
     }
 
-    public abstract void open(Player player);
-
     public void onClick(Player player, ItemStack item, ClickType clickType, int slot, boolean customInventory, InventoryClickEvent e) {
         if (!customInventory){
             if (!(clickType.equals(ClickType.DOUBLE_CLICK) || e.isShiftClick()))

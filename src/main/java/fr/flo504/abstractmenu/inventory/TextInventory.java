@@ -3,6 +3,7 @@ package fr.flo504.abstractmenu.inventory;
 import fr.flo504.abstractmenu.AbstractMenuPlugin;
 import fr.flo504.abstractmenu.factory.MenuFactory;
 import fr.flo504.abstractmenu.inventory.anvil.InventoryAnvil;
+import fr.flo504.abstractmenu.item.defaults.OpenableItemClickEvent;
 import fr.flo504.abstractmenu.parser.inventory.data.TextInventoryInfo;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -19,7 +20,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class TextInventory extends BaseInventory{
+public class TextInventory extends BaseInventory implements OpenableItemClickEvent.Openable {
 
     private final static AbstractMenuPlugin pluginInstance = JavaPlugin.getPlugin(AbstractMenuPlugin.class);
 

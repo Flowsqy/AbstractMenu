@@ -4,6 +4,7 @@ import fr.flo504.abstractmenu.factory.MenuFactory;
 import fr.flo504.abstractmenu.item.Clickable;
 import fr.flo504.abstractmenu.item.InventorySlot;
 import fr.flo504.abstractmenu.item.ItemClickEvent;
+import fr.flo504.abstractmenu.item.defaults.OpenableItemClickEvent;
 import fr.flo504.abstractmenu.utils.Cloneable;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -15,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class CustomInventory extends BaseInventory {
+public class CustomInventory extends BaseInventory implements OpenableItemClickEvent.Openable {
 
     private final int line;
 
@@ -31,6 +32,7 @@ public class CustomInventory extends BaseInventory {
         return line;
     }
 
+    @Override
     public void open(Player player) {
         final Inventory inventory = Bukkit.createInventory(null, line*9, name);
 

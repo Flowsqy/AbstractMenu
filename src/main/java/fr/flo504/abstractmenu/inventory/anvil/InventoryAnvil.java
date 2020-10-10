@@ -30,7 +30,10 @@ public class InventoryAnvil {
     private static final Object anvil;
     private static final Method getTitleMethod;
     private static final Field activeContainerField;
+    private static final Field defaultContainerField;
     private static final Method addSlotListenerMethod;
+    private static final Method handleInventoryCloseEventMethod;
+    private static final Constructor<?> packetPlayOutCloseWindowConstructor;
 
     static{
         final Class<?> craftPlayerClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT+"entity.CraftPlayer");
@@ -74,8 +77,14 @@ public class InventoryAnvil {
         anvil = Reflect.getStatic(anvilField);
         getTitleMethod = Reflect.getMethod(containerClass, "getTitle");
         activeContainerField = Reflect.getField(entityHumanClass, "activeContainer");
+        defaultContainerField = Reflect.getField(entityHumanClass, "defaultContainer");
         final Class<?> iCraftingClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"ICrafting");
         addSlotListenerMethod = Reflect.getMethod(containerClass, "addSlotListener", iCraftingClass);
+        final Class<?> craftEventFactoryClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT+"event.CraftEventFactory");
+        handleInventoryCloseEventMethod = Reflect.getMethod(craftEventFactoryClass, "handleInventoryCloseEvent", entityHumanClass);
+        final Class<?> packetPlayOutCloseWindowClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"PacketPlayOutCloseWindow");
+        packetPlayOutCloseWindowConstructor = Reflect.getConstructor(packetPlayOutCloseWindowClass, int.class);
+
 
         getHandleCraftPlayer.setAccessible(true);
         containerAnvilConstructor.setAccessible(true);
@@ -94,7 +103,10 @@ public class InventoryAnvil {
         packetPlayOutOpenWindowConstructor.setAccessible(true);
         getTitleMethod.setAccessible(true);
         activeContainerField.setAccessible(true);
+        defaultContainerField.setAccessible(true);
         addSlotListenerMethod.setAccessible(true);
+        handleInventoryCloseEventMethod.setAccessible(true);
+        packetPlayOutCloseWindowConstructor.setAccessible(true);
     }
 
     public static AnvilInventory create(String title, Player owner){
@@ -118,6 +130,9 @@ public class InventoryAnvil {
         final Object containerAnvil = Reflect.get(containerField, inventory);
         final Object entityPlayer = Reflect.invoke(getHandleCraftPlayer, player);
 
+        Reflect.invokeStatic(handleInventoryCloseEventMethod, entityPlayer);
+        Reflect.set(activeContainerField, entityPlayer, Reflect.get(defaultContainerField, entityPlayer));
+
         final Object id = Reflect.get(windowIdField, containerAnvil);
 
         final Object playerConnection = Reflect.get(playerConnectionField, entityPlayer);
@@ -130,6 +145,20 @@ public class InventoryAnvil {
 
         Reflect.set(activeContainerField, entityPlayer, containerAnvil);
         Reflect.invoke(addSlotListenerMethod, containerAnvil, entityPlayer);
+    }
+
+    public static void close(Player player, AnvilInventory inventory){
+        final Object containerAnvil = Reflect.get(containerField, inventory);
+        final Object entityPlayer = Reflect.invoke(getHandleCraftPlayer, player);
+
+        Reflect.invokeStatic(handleInventoryCloseEventMethod, entityPlayer);
+        Reflect.set(activeContainerField, entityPlayer, Reflect.get(defaultContainerField, entityPlayer));
+
+        final Object id = Reflect.get(windowIdField, containerAnvil);
+
+        final Object playerConnection = Reflect.get(playerConnectionField, entityPlayer);
+        final Object packetCloseWindow = Reflect.newInstance(packetPlayOutCloseWindowConstructor, id);
+        Reflect.invoke(sendPacketMethod, playerConnection, packetCloseWindow);
     }
 
 }

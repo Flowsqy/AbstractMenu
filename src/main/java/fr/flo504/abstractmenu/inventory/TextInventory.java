@@ -1,8 +1,10 @@
 package fr.flo504.abstractmenu.inventory;
 
+import fr.flo504.abstractmenu.AbstractMenuPlugin;
 import fr.flo504.abstractmenu.factory.MenuFactory;
 import fr.flo504.abstractmenu.inventory.anvil.InventoryAnvil;
 import fr.flo504.abstractmenu.parser.inventory.data.TextInventoryInfo;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -11,12 +13,15 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class TextInventory extends BaseInventory{
+
+    private final static AbstractMenuPlugin pluginInstance = JavaPlugin.getPlugin(AbstractMenuPlugin.class);
 
     private String placeholder;
     private BiConsumer<Player, String> callBack;
@@ -113,8 +118,10 @@ public class TextInventory extends BaseInventory{
         final Inventory inventory = player.getOpenInventory().getTopInventory();
         inventory.setItem(0, null);
         inventory.setItem(2, null);
-        if(closeCallback != null)
-            closeCallback.accept(player);
+        Bukkit.getScheduler().runTask(pluginInstance, () -> {
+            if(closeCallback != null)
+                closeCallback.accept(player);
+        });
     }
 
     @Override

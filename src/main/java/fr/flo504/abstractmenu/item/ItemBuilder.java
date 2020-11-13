@@ -1,14 +1,18 @@
 package fr.flo504.abstractmenu.item;
 
+import com.google.common.collect.Multimap;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ItemBuilder {
 
@@ -122,6 +126,74 @@ public class ItemBuilder {
         item.setItemMeta(meta);
 
         return item;
+    }
+
+    private final static String RESET_PATTERN = ChatColor.RESET.toString()+ChatColor.WHITE;
+
+    public static ItemBuilder deserialize(ConfigurationSection section){
+        Objects.requireNonNull(section);
+        //TODO
+        return null;
+    }
+
+    public static void serialize(ConfigurationSection section, ItemBuilder itemBuilder){
+        Objects.requireNonNull(section);
+        Objects.requireNonNull(itemBuilder);
+
+        section.set("name", itemBuilder.name());
+        section.set("lore", itemBuilder.lore()
+                .stream()
+                .map(line -> {
+                    if(line.startsWith(RESET_PATTERN))
+                        line = line.replaceFirst(RESET_PATTERN, "");
+                    line = line.replace(ChatColor.COLOR_CHAR, '&');
+                    return line;
+                })
+                .collect(Collectors.toList())
+                );
+        section.set("unbreakable", itemBuilder.unbreakable());
+        itemBuilder.enchants().forEach((enchant, level) -> section.set(enchant.getKey().getKey(), level));
+        section.set("flags", new ArrayList<>(itemBuilder.flags()));
+        itemBuilder.attributes().forEach((attribute, modifier) -> {
+            final ConfigurationSection subSection = section.createSection(attribute.name().toLowerCase());
+            subSection.set("uuid", modifier.getUniqueId().toString());
+            subSection.set("name", modifier.getName());
+            subSection.set("amount", modifier.getAmount());
+            subSection.set("operation", modifier.getOperation().name());
+            if(modifier.getSlot() != null)
+                subSection.set("slot", modifier.getSlot().name());
+        });
+
+    }
+
+    public static void serialize(ConfigurationSection section, ItemStack itemStack){
+        serialize(section, copy(itemStack));
+    }
+
+    public static ItemBuilder copy(ItemStack item){
+        Objects.requireNonNull(item);
+        final ItemBuilder builder = new ItemBuilder();
+
+        builder
+                .material(item.getType())
+                .amount(item.getAmount());
+
+        final ItemMeta meta = item.getItemMeta();
+        if(meta == null) // Normally impossible
+            return builder;
+
+        builder
+                .name(meta.getDisplayName())
+                .lore(meta.getLore())
+                .unbreakable(meta.isUnbreakable());
+
+        meta.getEnchants().forEach(builder::enchants);
+        meta.getItemFlags().forEach(builder::flags);
+        final Multimap<Attribute, AttributeModifier> attributes = meta.getAttributeModifiers();
+        if(attributes != null)
+            attributes.forEach(builder::attributes);
+
+        return builder;
     }
 
 }

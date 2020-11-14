@@ -4,6 +4,7 @@ import com.google.common.collect.Multimap;
 import fr.flo504.reflect.Reflect;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.ConfigurationSection;
@@ -114,8 +115,8 @@ public class ItemBuilder {
     }
 
     public ItemStack create(){
-        if(material == null)
-            return null;
+        Objects.requireNonNull(material, "Material can not be null");
+
         final ItemStack item = new ItemStack(material, amount);
         final ItemMeta meta = item.getItemMeta();
         if(meta == null) // Normally impossible
@@ -139,6 +140,8 @@ public class ItemBuilder {
         Objects.requireNonNull(section);
 
         final ItemBuilder builder = new ItemBuilder();
+
+        builder.material(Reflect.getEnumConstant(Material.class, section.getString("type")));
 
         String name = section.getString("name");
         if(name != null){
@@ -178,7 +181,7 @@ public class ItemBuilder {
                     continue;
                 }
 
-                final Enchantment enchantment = (Enchantment) Reflect.getStaticConstant(Enchantment.class, enchantKey);
+                final Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantKey));
 
                 builder.enchants(enchantment, level);
             }
@@ -239,12 +242,14 @@ public class ItemBuilder {
             }
         }
 
-        return null;
+        return builder;
     }
 
     public static void serialize(ConfigurationSection section, ItemBuilder itemBuilder){
         Objects.requireNonNull(section);
         Objects.requireNonNull(itemBuilder);
+
+        section.set("type", itemBuilder.material().name());
 
         String name = itemBuilder.name();
 
@@ -272,7 +277,11 @@ public class ItemBuilder {
             itemBuilder.enchants().forEach((enchant, level) -> enchantSection.set(enchant.getKey().getKey(), level));
         }
         if(!itemBuilder.flags().isEmpty())
-            section.set("flags", new ArrayList<>(itemBuilder.flags()));
+            section.set("flags", itemBuilder.flags().stream()
+                    .filter(Objects::nonNull)
+                    .map(ItemFlag::name)
+                    .collect(Collectors.toList()
+                    ));
         if(!itemBuilder.attributes().isEmpty()){
             final ConfigurationSection attributeSection = section.createSection("attributes");
             itemBuilder.attributes().forEach((attribute, modifier) -> {

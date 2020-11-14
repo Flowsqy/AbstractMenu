@@ -163,6 +163,7 @@ public class ItemBuilder {
         builder.lore(lore);
 
         builder.unbreakable(section.getBoolean("unbreakable"));
+        builder.amount(section.getInt("amount", 1));
 
         final ConfigurationSection enchantsSection = section.getConfigurationSection("enchants");
         if(enchantsSection != null){
@@ -215,12 +216,12 @@ public class ItemBuilder {
                 if(modifierName == null)
                     continue;
 
-                final String amountString = attributeSection.getString("amount");
-                if(amountString == null)
+                final String modifierAmountString = attributeSection.getString("amount");
+                if(modifierAmountString == null)
                     continue;
-                final double amount;
+                final double modifierAmount;
                 try{
-                    amount = Double.parseDouble(amountString);
+                    modifierAmount = Double.parseDouble(modifierAmountString);
                 }catch (NumberFormatException ignored){
                     continue;
                 }
@@ -232,7 +233,7 @@ public class ItemBuilder {
 
                 final EquipmentSlot slot = Reflect.getEnumConstant(EquipmentSlot.class, attributeSection.getString("slot"));
 
-                final AttributeModifier modifier = new AttributeModifier(uuid, modifierName, amount, operation, slot);
+                final AttributeModifier modifier = new AttributeModifier(uuid, modifierName, modifierAmount, operation, slot);
 
                 builder.attributes(attribute, modifier);
             }
@@ -264,6 +265,7 @@ public class ItemBuilder {
                 })
                 .collect(Collectors.toList())
                 );
+        section.set("amount", itemBuilder.amount());
         section.set("unbreakable", itemBuilder.unbreakable());
         if(!itemBuilder.enchants().isEmpty()){
             final ConfigurationSection enchantSection = section.createSection("enchants");

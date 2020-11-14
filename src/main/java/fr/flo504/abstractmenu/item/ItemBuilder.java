@@ -28,6 +28,8 @@ public class ItemBuilder {
     private final Set<ItemFlag> flags;
     private final Map<Attribute, AttributeModifier> attributes;
 
+    private CreatorListener creatorListener;
+
     public ItemBuilder() {
         lore = new ArrayList<>();
         enchants = new HashMap<>();
@@ -114,8 +116,17 @@ public class ItemBuilder {
         return this;
     }
 
+    public CreatorListener creatorListener() {
+        return creatorListener;
+    }
+
+    public ItemBuilder creatorListener(CreatorListener creatorListener) {
+        this.creatorListener = creatorListener;
+        return this;
+    }
+
     public ItemStack create(){
-        return create(null);
+        return create(creatorListener);
     }
 
     public ItemStack create(CreatorListener creatorListener){

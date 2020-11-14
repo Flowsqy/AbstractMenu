@@ -1,12 +1,14 @@
 package fr.flo504.abstractmenu.item;
 
 import com.google.common.collect.Multimap;
+import fr.flo504.reflect.Reflect;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -86,7 +88,8 @@ public class ItemBuilder {
     }
 
     public ItemBuilder enchants(Enchantment enchantment, int level) {
-        enchants.put(enchantment, level);
+        if(enchantment != null)
+            enchants.put(enchantment, level);
         return this;
     }
 
@@ -95,7 +98,8 @@ public class ItemBuilder {
     }
 
     public ItemBuilder flags(ItemFlag flag) {
-        flags.add(flag);
+        if(flag != null)
+            flags.add(flag);
         return this;
     }
 
@@ -104,7 +108,8 @@ public class ItemBuilder {
     }
 
     public ItemBuilder attributes(Attribute attribute, AttributeModifier modifier) {
-        attributes.put(attribute, modifier);
+        if(attribute != null && modifier != null)
+            attributes.put(attribute, modifier);
         return this;
     }
 
@@ -132,7 +137,107 @@ public class ItemBuilder {
 
     public static ItemBuilder deserialize(ConfigurationSection section){
         Objects.requireNonNull(section);
-        //TODO
+
+        final ItemBuilder builder = new ItemBuilder();
+
+        String name = section.getString("name");
+        if(name != null){
+            name = ChatColor.translateAlternateColorCodes('&', name);
+            if(!name.startsWith(RESET_PATTERN))
+                name = RESET_PATTERN + name;
+            builder.name(name);
+        }
+
+        List<String> lore = section.getStringList("lore");
+        lore = lore.stream()
+                .filter(Objects::nonNull)
+                .map(line -> {
+                        line = ChatColor.translateAlternateColorCodes('&', line);
+                        if(!line.startsWith(RESET_PATTERN))
+                            line = RESET_PATTERN + line;
+                        return line;
+
+                })
+                .collect(Collectors.toList());
+
+        builder.lore(lore);
+
+        builder.unbreakable(section.getBoolean("unbreakable"));
+
+        final ConfigurationSection enchantsSection = section.getConfigurationSection("enchants");
+        if(enchantsSection != null){
+            for(String enchantKey : enchantsSection.getKeys(false)){
+                final String levelString = enchantsSection.getString(enchantKey);
+                if(levelString == null)
+                    continue;
+                final int level;
+                try{
+                    level = Integer.parseInt(levelString);
+                }catch (NumberFormatException ignored){
+                    continue;
+                }
+
+                final Enchantment enchantment = (Enchantment) Reflect.getStaticConstant(Enchantment.class, enchantKey);
+
+                builder.enchants(enchantment, level);
+            }
+        }
+
+        final List<String> flags = section.getStringList("flags");
+        for(String flagString : flags){
+            final ItemFlag flag = Reflect.getEnumConstant(ItemFlag.class, flagString);
+            builder.flags(flag);
+        }
+
+        final ConfigurationSection attributesSection = section.getConfigurationSection("attributes");
+        if(attributesSection != null){
+            for(final String attributeKey : attributesSection.getKeys(false)){
+                final ConfigurationSection attributeSection = attributesSection.getConfigurationSection(attributeKey);
+                if(attributeSection == null)
+                    continue;
+
+                final Attribute attribute = Reflect.getEnumConstant(Attribute.class, attributeKey);
+                if(attribute == null)
+                    continue;
+
+                final String rawUuid = attributeSection.getString("uuid", "");
+                UUID uuid;
+                if(rawUuid == null || rawUuid.split("-").length != 5)
+                    uuid = UUID.randomUUID();
+                else {
+                    try{
+                        uuid = UUID.fromString(rawUuid);
+                    }catch (NumberFormatException ignored){
+                        uuid = UUID.randomUUID();
+                    }
+                }
+                final String modifierName = attributeSection.getString("name");
+                if(modifierName == null)
+                    continue;
+
+                final String amountString = attributeSection.getString("amount");
+                if(amountString == null)
+                    continue;
+                final double amount;
+                try{
+                    amount = Double.parseDouble(amountString);
+                }catch (NumberFormatException ignored){
+                    continue;
+                }
+
+                final String operationString = attributeSection.getString("operation");
+                final AttributeModifier.Operation operation = Reflect.getEnumConstant(AttributeModifier.Operation.class, operationString);
+                if(operation == null)
+                    continue;
+
+                final EquipmentSlot slot = Reflect.getEnumConstant(EquipmentSlot.class, attributeSection.getString("slot"));
+
+                final AttributeModifier modifier = new AttributeModifier(uuid, modifierName, amount, operation, slot);
+
+                builder.attributes(attribute, modifier);
+            }
+        }
+
         return null;
     }
 
@@ -140,9 +245,17 @@ public class ItemBuilder {
         Objects.requireNonNull(section);
         Objects.requireNonNull(itemBuilder);
 
-        section.set("name", itemBuilder.name());
+        String name = itemBuilder.name();
+
+        if(name.startsWith(RESET_PATTERN))
+            name = name.replaceFirst(RESET_PATTERN, "");
+
+        name = name.replace(ChatColor.COLOR_CHAR, '&');
+
+        section.set("name", name);
         section.set("lore", itemBuilder.lore()
                 .stream()
+                .filter(Objects::nonNull)
                 .map(line -> {
                     if(line.startsWith(RESET_PATTERN))
                         line = line.replaceFirst(RESET_PATTERN, "");
@@ -152,17 +265,23 @@ public class ItemBuilder {
                 .collect(Collectors.toList())
                 );
         section.set("unbreakable", itemBuilder.unbreakable());
-        itemBuilder.enchants().forEach((enchant, level) -> section.set(enchant.getKey().getKey(), level));
-        section.set("flags", new ArrayList<>(itemBuilder.flags()));
-        itemBuilder.attributes().forEach((attribute, modifier) -> {
-            final ConfigurationSection subSection = section.createSection(attribute.name().toLowerCase());
-            subSection.set("uuid", modifier.getUniqueId().toString());
-            subSection.set("name", modifier.getName());
-            subSection.set("amount", modifier.getAmount());
-            subSection.set("operation", modifier.getOperation().name());
-            if(modifier.getSlot() != null)
-                subSection.set("slot", modifier.getSlot().name());
-        });
+        if(!itemBuilder.enchants().isEmpty()){
+            final ConfigurationSection enchantSection = section.createSection("enchants");
+            itemBuilder.enchants().forEach((enchant, level) -> enchantSection.set(enchant.getKey().getKey(), level));
+        }
+        if(!itemBuilder.flags().isEmpty())
+            section.set("flags", new ArrayList<>(itemBuilder.flags()));
+        if(!itemBuilder.attributes().isEmpty()){
+            final ConfigurationSection attributeSection = section.createSection("attributes");
+            itemBuilder.attributes().forEach((attribute, modifier) -> {
+                final ConfigurationSection subSection = attributeSection.createSection(attribute.name().toLowerCase());
+                subSection.set("uuid", modifier.getUniqueId().toString());
+                subSection.set("name", modifier.getName());
+                subSection.set("amount", modifier.getAmount());
+                subSection.set("operation", modifier.getOperation().name());
+                subSection.set("slot", modifier.getSlot() != null ? modifier.getSlot().name() : null);
+            });
+        }
 
     }
 

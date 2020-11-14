@@ -115,19 +115,36 @@ public class ItemBuilder {
     }
 
     public ItemStack create(){
+        return create(null);
+    }
+
+    public ItemStack create(CreatorListener creatorListener){
+        if(creatorListener == null)
+            creatorListener = new CreatorAdaptor();
+
+        final Material handledMaterial = creatorListener.handleMaterial(material);
+
         Objects.requireNonNull(material, "Material can not be null");
 
-        final ItemStack item = new ItemStack(material, amount);
+        final ItemStack item = new ItemStack(handledMaterial, creatorListener.handleAmount(amount));
         final ItemMeta meta = item.getItemMeta();
         if(meta == null) // Normally impossible
             return item;
 
-        meta.setDisplayName(name);
-        meta.setUnbreakable(unbreakable);
-        meta.setLore(lore);
-        enchants.forEach((enchant, level) -> meta.addEnchant(enchant, level, true));
-        flags.forEach(meta::addItemFlags);
-        attributes.forEach(meta::addAttributeModifier);
+        meta.setDisplayName(creatorListener.handleName(name));
+        meta.setUnbreakable(creatorListener.handleUnbreakable(unbreakable));
+        meta.setLore(creatorListener.handleLore(lore));
+
+        Map<Enchantment, Integer> handledEnchants = creatorListener.handleEnchants(enchants);
+        Set<ItemFlag> handledFlags = creatorListener.handleFlags(flags);
+        Map<Attribute, AttributeModifier> handledAttributes = creatorListener.handleAttributes(attributes);
+
+        if(handledEnchants != null)
+            handledEnchants.forEach((enchant, level) -> meta.addEnchant(enchant, level, true));
+        if(handledFlags != null)
+            handledFlags.forEach(meta::addItemFlags);
+        if(handledAttributes != null)
+            handledAttributes.forEach(meta::addAttributeModifier);
 
         item.setItemMeta(meta);
 

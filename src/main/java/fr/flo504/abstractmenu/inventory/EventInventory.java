@@ -10,7 +10,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class EventInventory {
@@ -52,14 +51,19 @@ public class EventInventory {
         this.line = line;
     }
 
-    public void register(ItemBuilder builder, int... slots){
+    public void register(ItemBuilder builder, Integer... slots){
         register(builder, null, slots);
     }
 
-    public void register(ItemBuilder builder, Consumer<InventoryClickEvent> event, int... slots){
-        if(slots.length == 0)
-            return;
+    public void register(ItemBuilder builder, Consumer<InventoryClickEvent> event, Integer... slots){
+        register(builder, event, Arrays.asList(slots));
+    }
 
+    public void register(ItemBuilder builder, List<Integer> slots){
+        register(builder, null, slots);
+    }
+
+    public void register(ItemBuilder builder, Consumer<InventoryClickEvent> event, List<Integer> slots){
         for(int slot : slots){
             if(builder != null)
                 this.slots.put(slot, builder);
@@ -86,19 +90,19 @@ public class EventInventory {
             eventHandler.accept(event);
     }
 
-    public static EventInventory deserialize(
-            ConfigurationSection section,
-            MenuFactory factory,
-            BiConsumer<EventInventory, Map.Entry<ItemBuilder, List<Integer>>> registerHandler)
-    {
+    public static EventInventory deserialize(ConfigurationSection section, MenuFactory factory, RegisterHandler registerHandler) {
+        if(section == null)
+            return null;
+
         String name = section.getString("name");
         if(name != null)
             name = ChatColor.translateAlternateColorCodes('&', name);
         final int line = section.getInt("line");
 
+        final EventInventory eventInventory = new EventInventory(factory, name, line);
+
         final ConfigurationSection slotsSection = section.getConfigurationSection("items");
 
-        final Map<ItemBuilder, List<Integer>> slots = new HashMap<>();
         if(slotsSection != null){
             for(String keySubSection : slotsSection.getKeys(false)){
                 final ConfigurationSection slotSection = slotsSection.getConfigurationSection(keySubSection);
@@ -110,14 +114,8 @@ public class EventInventory {
                     continue;
                 final ItemBuilder builder = ItemBuilder.deserialize(itemSection);
 
-                slots.put(builder, rawSlots);
+                registerHandler.handle(eventInventory, keySubSection, builder, rawSlots);
             }
-        }
-
-        final EventInventory eventInventory = new EventInventory(factory, name, line);
-
-        for(Map.Entry<ItemBuilder, List<Integer>> entry : slots.entrySet()){
-            registerHandler.accept(eventInventory, entry);
         }
 
         return eventInventory;
@@ -145,6 +143,15 @@ public class EventInventory {
             slotSection.set("slots", entry.getValue());
             index++;
         }
+    }
+
+    public final static RegisterHandler REGISTER = (eventInventory, key, builder, slots) -> eventInventory.register(builder, slots);
+    public final static RegisterHandler NOTHING = (eventInventory, key, builder, slots) -> {};
+
+    public interface RegisterHandler {
+
+        void handle(EventInventory eventInventory, String key, ItemBuilder builder, List<Integer> slots);
+
     }
 
 }

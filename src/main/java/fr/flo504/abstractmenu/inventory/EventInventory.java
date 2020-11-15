@@ -122,6 +122,9 @@ public class EventInventory {
     }
 
     public static void serialize(ConfigurationSection section, EventInventory eventInventory){
+        Objects.requireNonNull(section);
+        Objects.requireNonNull(eventInventory);
+
         section.set("name", eventInventory.getName().replace(ChatColor.COLOR_CHAR, '&'));
         section.set("line", eventInventory.getLine());
 

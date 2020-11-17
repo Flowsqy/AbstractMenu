@@ -71,7 +71,11 @@ public class EventInventory {
         if(builder == null && event == null)
             return;
 
+        final int slotCount = line*9;
+
         for(int slot : slots){
+            if(slot >= slotCount && slotCount >= 0)
+                continue;
             if(builder != null)
                 this.slots.put(slot, builder);
             if(event != null)

@@ -11,7 +11,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class MenuFactory implements Listener {
 
@@ -35,6 +38,13 @@ public class MenuFactory implements Listener {
 
         if(inventory == null)
             return;
+
+        final ClickType type = e.getClick();
+
+        if(type == ClickType.DOUBLE_CLICK || type.isShiftClick()){
+            e.setCancelled(true);
+            return;
+        }
 
         final int rawSlot = e.getRawSlot();
         if(rawSlot < inv.getSize())

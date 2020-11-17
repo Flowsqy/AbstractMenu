@@ -24,6 +24,7 @@ public class EventInventory {
     private final Map<Integer, Consumer<InventoryClickEvent>> events;
 
     public EventInventory(MenuFactory factory, String name, int line) {
+        Objects.requireNonNull(factory);
         this.factory = factory;
         this.name = name;
         setLine(line);
@@ -64,6 +65,12 @@ public class EventInventory {
     }
 
     public void register(ItemBuilder builder, Consumer<InventoryClickEvent> event, List<Integer> slots){
+        if(slots == null)
+            return;
+
+        if(builder == null && event == null)
+            return;
+
         for(int slot : slots){
             if(builder != null)
                 this.slots.put(slot, builder);
@@ -103,16 +110,15 @@ public class EventInventory {
 
         final ConfigurationSection slotsSection = section.getConfigurationSection("items");
 
-        if(slotsSection != null){
+        if(slotsSection != null && registerHandler != null){
             for(String keySubSection : slotsSection.getKeys(false)){
                 final ConfigurationSection slotSection = slotsSection.getConfigurationSection(keySubSection);
                 if(slotSection == null) // Normally impossible
                     continue;
                 final List<Integer> rawSlots = slotSection.getIntegerList("slots");
                 final ConfigurationSection itemSection = slotSection.getConfigurationSection("item");
-                if(itemSection == null)
-                    continue;
-                final ItemBuilder builder = ItemBuilder.deserialize(itemSection);
+
+                final ItemBuilder builder = itemSection == null ? null : ItemBuilder.deserialize(itemSection);
 
                 registerHandler.handle(eventInventory, keySubSection, builder, rawSlots);
             }

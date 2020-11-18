@@ -37,6 +37,18 @@ public class ItemBuilder {
         attributes = new HashMap<>();
     }
 
+    private ItemBuilder(ItemBuilder builder){
+        this.name = builder.name;
+        this.material = builder.material;
+        this.amount = builder.amount;
+        this.unbreakable = builder.unbreakable;
+        this.lore = builder.lore == null ? null : new ArrayList<>(builder.lore());
+        this.enchants = new HashMap<>(builder.enchants());
+        this.flags = new HashSet<>(builder.flags());
+        this.attributes = new HashMap<>(builder.attributes);
+        this.creatorListener = creatorListener();
+    }
+
     public String name() {
         return name;
     }
@@ -160,6 +172,11 @@ public class ItemBuilder {
         item.setItemMeta(meta);
 
         return item;
+    }
+
+    @Override
+    public ItemBuilder clone() {
+        return new ItemBuilder(this);
     }
 
     private final static String RESET_PATTERN = ChatColor.RESET.toString()+ChatColor.WHITE;

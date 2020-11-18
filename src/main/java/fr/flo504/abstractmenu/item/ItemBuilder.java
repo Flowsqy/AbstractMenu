@@ -147,7 +147,8 @@ public class ItemBuilder {
 
         final Material handledMaterial = creatorListener.handleMaterial(material);
 
-        Objects.requireNonNull(material, "Material can not be null");
+        if(material == null)
+            return null;
 
         final ItemStack item = new ItemStack(handledMaterial, creatorListener.handleAmount(amount));
         final ItemMeta meta = item.getItemMeta();
@@ -158,9 +159,9 @@ public class ItemBuilder {
         meta.setUnbreakable(creatorListener.handleUnbreakable(unbreakable));
         meta.setLore(creatorListener.handleLore(lore));
 
-        Map<Enchantment, Integer> handledEnchants = creatorListener.handleEnchants(enchants);
-        Set<ItemFlag> handledFlags = creatorListener.handleFlags(flags);
-        Map<Attribute, AttributeModifier> handledAttributes = creatorListener.handleAttributes(attributes);
+        final Map<Enchantment, Integer> handledEnchants = creatorListener.handleEnchants(enchants);
+        final Set<ItemFlag> handledFlags = creatorListener.handleFlags(flags);
+        final Map<Attribute, AttributeModifier> handledAttributes = creatorListener.handleAttributes(attributes);
 
         if(handledEnchants != null)
             handledEnchants.forEach((enchant, level) -> meta.addEnchant(enchant, level, true));

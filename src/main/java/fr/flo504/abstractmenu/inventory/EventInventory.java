@@ -23,13 +23,20 @@ public class EventInventory {
     private final Map<Integer, ItemBuilder> slots;
     private final Map<Integer, Consumer<InventoryClickEvent>> events;
 
+    private boolean transaction;
+
     public EventInventory(MenuFactory factory, String name, int line) {
+        this(factory, name, line, false);
+    }
+
+    public EventInventory(MenuFactory factory, String name, int line, boolean transaction) {
         Objects.requireNonNull(factory);
         this.factory = factory;
         this.name = name;
         setLine(line);
         this.slots = new HashMap<>();
         this.events = new HashMap<>();
+        this.transaction = transaction;
     }
 
     public String getName() {
@@ -50,6 +57,14 @@ public class EventInventory {
         if(line < 1)
             line = 1;
         this.line = line;
+    }
+
+    public boolean isTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(boolean transaction) {
+        this.transaction = transaction;
     }
 
     public void register(ItemBuilder builder, Integer... slots){
@@ -83,6 +98,19 @@ public class EventInventory {
         }
     }
 
+    public void clearSlots(){
+        this.slots.clear();
+    }
+
+    public void clearEvents(){
+        this.events.clear();
+    }
+
+    public void clear(){
+        clearSlots();
+        clearEvents();
+    }
+
     public void open(Player player){
         final Inventory inventory = Bukkit.createInventory(null, line*9, RESET_PATTERN + name);
 
@@ -95,14 +123,10 @@ public class EventInventory {
     public void onClose(Player player){}
 
     public void onClick(int rawSlot, InventoryClickEvent event){
-        event.setCancelled(!allowTransaction());
+        event.setCancelled(!isTransaction());
         final Consumer<InventoryClickEvent> eventHandler = events.get(rawSlot);
         if(eventHandler != null)
             eventHandler.accept(event);
-    }
-
-    public boolean allowTransaction(){
-        return false;
     }
 
     public static EventInventory deserialize(ConfigurationSection section, MenuFactory factory, RegisterHandler registerHandler) {

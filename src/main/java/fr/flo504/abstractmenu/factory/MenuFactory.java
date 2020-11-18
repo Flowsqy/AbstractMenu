@@ -42,7 +42,7 @@ public class MenuFactory implements Listener {
         final ClickType type = e.getClick();
 
         if(type == ClickType.DOUBLE_CLICK || type.isShiftClick()){
-            e.setCancelled(true);
+            e.setCancelled(!inventory.allowTransaction());
             return;
         }
 
@@ -58,7 +58,7 @@ public class MenuFactory implements Listener {
         final Inventory inv = view.getTopInventory();
         final EventInventory eventInventory = inventories.get(inv);
 
-        if(!this.inventories.containsKey(inv))
+        if(eventInventory == null)
             return;
 
         final Set<Integer> rawSlots = e.getRawSlots();
@@ -80,10 +80,12 @@ public class MenuFactory implements Listener {
             }
         }
 
-        for(int slot : rawSlots) {
-            if(slot < inventorySize) {
-                e.setCancelled(true);
-                return;
+        if(!eventInventory.allowTransaction()){
+            for(int slot : rawSlots) {
+                if(slot < inventorySize) {
+                    e.setCancelled(true);
+                    return;
+                }
             }
         }
 

@@ -95,10 +95,14 @@ public class EventInventory {
     public void onClose(Player player){}
 
     public void onClick(int rawSlot, InventoryClickEvent event){
-        event.setCancelled(true);
+        event.setCancelled(!allowTransaction());
         final Consumer<InventoryClickEvent> eventHandler = events.get(rawSlot);
         if(eventHandler != null)
             eventHandler.accept(event);
+    }
+
+    public boolean allowTransaction(){
+        return false;
     }
 
     public static EventInventory deserialize(ConfigurationSection section, MenuFactory factory, RegisterHandler registerHandler) {

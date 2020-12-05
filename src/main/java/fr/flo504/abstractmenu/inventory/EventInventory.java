@@ -8,6 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -134,6 +135,15 @@ public class EventInventory {
 
     public void refresh(Inventory inventory){
         slots.forEach((key, value) -> inventory.setItem(key, value.create()));
+    }
+
+    public void refresh(Iterable<Inventory> inventories){
+        final Map<Integer, ItemStack> items = slots.entrySet().stream()
+                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().create()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        for(Inventory inventory : inventories){
+            items.forEach(inventory::setItem);
+        }
     }
 
     public void onClose(Player player){}

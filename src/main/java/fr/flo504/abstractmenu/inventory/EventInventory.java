@@ -8,10 +8,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class EventInventory {
 
@@ -38,6 +38,17 @@ public class EventInventory {
         this.slots = new HashMap<>();
         this.events = new HashMap<>();
         this.transaction = transaction;
+    }
+
+    public EventInventory(EventInventory eventInventory) {
+        factory = eventInventory.factory;
+        name = eventInventory.name;
+        line = eventInventory.line;
+        slots = eventInventory.slots.entrySet().stream()
+            .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().clone()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        events = eventInventory.events;
+        transaction = eventInventory.transaction;
     }
 
     public String getName() {
@@ -132,6 +143,10 @@ public class EventInventory {
         final Consumer<InventoryClickEvent> eventHandler = events.get(rawSlot);
         if(eventHandler != null)
             eventHandler.accept(event);
+    }
+
+    public EventInventory clone(){
+        return new EventInventory(this);
     }
 
     public static EventInventory deserialize(ConfigurationSection section, MenuFactory factory, RegisterHandler registerHandler) {

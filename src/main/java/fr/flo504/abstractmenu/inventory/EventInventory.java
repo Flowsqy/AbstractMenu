@@ -27,6 +27,8 @@ public class EventInventory {
 
     private boolean transaction;
 
+    private Consumer<Player> closeCallback;
+
     public EventInventory(MenuFactory factory, String name, int line) {
         this(factory, name, line, false);
     }
@@ -50,6 +52,7 @@ public class EventInventory {
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         events = eventInventory.events;
         transaction = eventInventory.transaction;
+        closeCallback = eventInventory.closeCallback;
     }
 
     public String getName() {
@@ -78,6 +81,14 @@ public class EventInventory {
 
     public void setTransaction(boolean transaction) {
         this.transaction = transaction;
+    }
+
+    public Consumer<Player> getCloseCallback() {
+        return closeCallback;
+    }
+
+    public void setCloseCallback(Consumer<Player> closeCallback) {
+        this.closeCallback = closeCallback;
     }
 
     public void register(ItemBuilder builder, Integer... slots){
@@ -146,7 +157,10 @@ public class EventInventory {
         }
     }
 
-    public void onClose(Player player){}
+    public void onClose(Player player){
+        if(closeCallback != null)
+            closeCallback.accept(player);
+    }
 
     public void onClick(int rawSlot, InventoryClickEvent event){
         event.setCancelled(!isTransaction());

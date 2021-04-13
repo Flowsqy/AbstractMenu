@@ -12,7 +12,7 @@ public class AbstractMenuPlugin extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         final Plugin plugin = Bukkit.getPluginManager().getPlugin("Reflect");
-        if(plugin == null || !plugin.isEnabled()){
+        if (plugin == null || !plugin.isEnabled()) {
             this.getLogger().log(Level.WARNING, "There is not reflect api plugin, disabling the api");
             Bukkit.getPluginManager().disablePlugin(this);
         }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class CreatorCopy implements CreatorListener{
+public class CreatorCopy implements CreatorListener {
 
     private ItemBuilder original;
 

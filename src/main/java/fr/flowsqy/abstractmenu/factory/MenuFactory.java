@@ -26,28 +26,28 @@ public class MenuFactory implements Listener {
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public void register(Inventory inventory, EventInventory eventInventory){
+    public void register(Inventory inventory, EventInventory eventInventory) {
         inventories.put(inventory, eventInventory);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
-    private void handleClick(InventoryClickEvent e){
+    private void handleClick(InventoryClickEvent e) {
         final Inventory inv = e.getInventory();
 
         final EventInventory inventory = inventories.get(inv);
 
-        if(inventory == null)
+        if (inventory == null)
             return;
 
         final ClickType type = e.getClick();
 
-        if(type == ClickType.DOUBLE_CLICK || type.isShiftClick()){
+        if (type == ClickType.DOUBLE_CLICK || type.isShiftClick()) {
             e.setCancelled(!inventory.isTransaction());
             return;
         }
 
         final int rawSlot = e.getRawSlot();
-        if(rawSlot < inv.getSize())
+        if (rawSlot < inv.getSize())
             inventory.onClick(rawSlot, e);
     }
 
@@ -58,16 +58,16 @@ public class MenuFactory implements Listener {
         final Inventory inv = view.getTopInventory();
         final EventInventory eventInventory = inventories.get(inv);
 
-        if(eventInventory == null)
+        if (eventInventory == null)
             return;
 
         final Set<Integer> rawSlots = e.getRawSlots();
 
         final int inventorySize = inv.getSize();
 
-        if(rawSlots.size() == 1){
+        if (rawSlots.size() == 1) {
             final int rawSlot = new ArrayList<>(rawSlots).get(0);
-            if(rawSlot < inventorySize){
+            if (rawSlot < inventorySize) {
                 final InventoryClickEvent inventoryClickEvent = new InventoryClickEvent(
                         view,
                         view.getSlotType(rawSlot),
@@ -80,9 +80,9 @@ public class MenuFactory implements Listener {
             }
         }
 
-        if(!eventInventory.isTransaction()){
-            for(int slot : rawSlots) {
-                if(slot < inventorySize) {
+        if (!eventInventory.isTransaction()) {
+            for (int slot : rawSlots) {
+                if (slot < inventorySize) {
                     e.setCancelled(true);
                     return;
                 }
@@ -92,10 +92,10 @@ public class MenuFactory implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    private void handleClose(InventoryCloseEvent e){
+    private void handleClose(InventoryCloseEvent e) {
         final EventInventory inventory = inventories.get(e.getInventory());
 
-        if(inventory != null)
+        if (inventory != null)
             inventory.onClose((Player) e.getPlayer());
     }
 

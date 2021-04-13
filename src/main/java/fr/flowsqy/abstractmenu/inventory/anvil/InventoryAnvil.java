@@ -35,42 +35,42 @@ public class InventoryAnvil {
     private static final Method handleInventoryCloseEventMethod;
     private static final Constructor<?> packetPlayOutCloseWindowConstructor;
 
-    static{
-        final Class<?> craftPlayerClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT+"entity.CraftPlayer");
+    static {
+        final Class<?> craftPlayerClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT + "entity.CraftPlayer");
         getHandleCraftPlayer = Reflect.getMethod(craftPlayerClass, "getHandle");
-        final Class<?> containerAnvilClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"ContainerAnvil");
-        final Class<?> playerInventoryClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"PlayerInventory");
-        final Class<?> containerAccessClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"ContainerAccess");
-        containerAnvilConstructor = Reflect.getConstructor(containerAnvilClass, int.class,playerInventoryClass, containerAccessClass);
-        final Class<?> entityPlayerClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"EntityPlayer");
+        final Class<?> containerAnvilClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "ContainerAnvil");
+        final Class<?> playerInventoryClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "PlayerInventory");
+        final Class<?> containerAccessClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "ContainerAccess");
+        containerAnvilConstructor = Reflect.getConstructor(containerAnvilClass, int.class, playerInventoryClass, containerAccessClass);
+        final Class<?> entityPlayerClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "EntityPlayer");
         nextContainerCounterMethod = Reflect.getMethod(entityPlayerClass, "nextContainerCounter");
-        final Class<?> entityHumanClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"EntityHuman");
+        final Class<?> entityHumanClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "EntityHuman");
         inventoryField = Reflect.getField(entityHumanClass, "inventory");
-        final Class<?> worldClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"World");
-        final Class<?> blockPositionClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"BlockPosition");
+        final Class<?> worldClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "World");
+        final Class<?> blockPositionClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "BlockPosition");
         final Field zeroField = Reflect.getField(blockPositionClass, "ZERO");
         zeroField.setAccessible(true);
         zeroBlockPosition = Reflect.getStatic(zeroField);
         atContainerAccess = Reflect.getMethod(containerAccessClass, "at", worldClass, blockPositionClass);
-        final Class<?> craftWorldClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT+"CraftWorld");
+        final Class<?> craftWorldClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT + "CraftWorld");
         getHandleCraftWorld = Reflect.getMethod(craftWorldClass, "getHandle");
-        final Class<?> containerClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"Container");
+        final Class<?> containerClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "Container");
         checkReachableField = Reflect.getField(containerClass, "checkReachable");
-        final Class<?> iChatBaseComponentClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"IChatBaseComponent");
+        final Class<?> iChatBaseComponentClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "IChatBaseComponent");
         setTitleMethod = Reflect.getMethod(containerClass, "setTitle", iChatBaseComponentClass);
-        final Class<?> chatMessageClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"ChatMessage");
+        final Class<?> chatMessageClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "ChatMessage");
         chatMessageConstructor = Reflect.getConstructor(chatMessageClass, String.class);
         getBukkitViewMethod = Reflect.getMethod(containerAnvilClass, "getBukkitView");
-        
-        final Class<?> craftInventoryClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT+"inventory.CraftInventoryAnvil");
+
+        final Class<?> craftInventoryClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT + "inventory.CraftInventoryAnvil");
         containerField = Reflect.getField(craftInventoryClass, "container");
         windowIdField = Reflect.getField(containerClass, "windowId");
         playerConnectionField = Reflect.getField(entityPlayerClass, "playerConnection");
-        final Class<?> playerConnectionClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"PlayerConnection");
-        final Class<?> packetClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"Packet");
+        final Class<?> playerConnectionClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "PlayerConnection");
+        final Class<?> packetClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "Packet");
         sendPacketMethod = Reflect.getMethod(playerConnectionClass, "sendPacket", packetClass);
-        final Class<?> packetPlayOutOpenWindowClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"PacketPlayOutOpenWindow");
-        final Class<?> containersClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"Containers");
+        final Class<?> packetPlayOutOpenWindowClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "PacketPlayOutOpenWindow");
+        final Class<?> containersClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "Containers");
         packetPlayOutOpenWindowConstructor = Reflect.getConstructor(packetPlayOutOpenWindowClass, int.class, containersClass, iChatBaseComponentClass);
         final Field anvilField = Reflect.getField(containersClass, "ANVIL");
         anvilField.setAccessible(true);
@@ -78,11 +78,11 @@ public class InventoryAnvil {
         getTitleMethod = Reflect.getMethod(containerClass, "getTitle");
         activeContainerField = Reflect.getField(entityHumanClass, "activeContainer");
         defaultContainerField = Reflect.getField(entityHumanClass, "defaultContainer");
-        final Class<?> iCraftingClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"ICrafting");
+        final Class<?> iCraftingClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "ICrafting");
         addSlotListenerMethod = Reflect.getMethod(containerClass, "addSlotListener", iCraftingClass);
-        final Class<?> craftEventFactoryClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT+"event.CraftEventFactory");
+        final Class<?> craftEventFactoryClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT + "event.CraftEventFactory");
         handleInventoryCloseEventMethod = Reflect.getMethod(craftEventFactoryClass, "handleInventoryCloseEvent", entityHumanClass);
-        final Class<?> packetPlayOutCloseWindowClass = Reflect.getClass(Reflect.Commons.MINECRAFT+"PacketPlayOutCloseWindow");
+        final Class<?> packetPlayOutCloseWindowClass = Reflect.getClass(Reflect.Commons.MINECRAFT + "PacketPlayOutCloseWindow");
         packetPlayOutCloseWindowConstructor = Reflect.getConstructor(packetPlayOutCloseWindowClass, int.class);
 
 
@@ -109,7 +109,7 @@ public class InventoryAnvil {
         packetPlayOutCloseWindowConstructor.setAccessible(true);
     }
 
-    public static AnvilInventory create(String title, Player owner){
+    public static AnvilInventory create(String title, Player owner) {
         final Object entityPlayer = Reflect.invoke(getHandleCraftPlayer, owner);
 
         final Object containerAnvil = Reflect.newInstance(containerAnvilConstructor,
@@ -118,15 +118,15 @@ public class InventoryAnvil {
                 Reflect.invokeStatic(atContainerAccess,
                         Reflect.invoke(getHandleCraftWorld, owner.getWorld()),
                         zeroBlockPosition
-                        )
-                );
+                )
+        );
         Reflect.set(checkReachableField, containerAnvil, false);
         Reflect.invoke(setTitleMethod, containerAnvil, Reflect.newInstance(chatMessageConstructor, title));
 
-        return (AnvilInventory) ((InventoryView)Reflect.invoke(getBukkitViewMethod, containerAnvil)).getTopInventory();
+        return (AnvilInventory) ((InventoryView) Reflect.invoke(getBukkitViewMethod, containerAnvil)).getTopInventory();
     }
 
-    public static void open(Player player, AnvilInventory inventory){
+    public static void open(Player player, AnvilInventory inventory) {
         final Object containerAnvil = Reflect.get(containerField, inventory);
         final Object entityPlayer = Reflect.invoke(getHandleCraftPlayer, player);
 
@@ -140,14 +140,14 @@ public class InventoryAnvil {
                 id,
                 anvil,
                 Reflect.invoke(getTitleMethod, containerAnvil)
-                );
+        );
         Reflect.invoke(sendPacketMethod, playerConnection, packetOpenWindow);
 
         Reflect.set(activeContainerField, entityPlayer, containerAnvil);
         Reflect.invoke(addSlotListenerMethod, containerAnvil, entityPlayer);
     }
 
-    public static void close(Player player, AnvilInventory inventory){
+    public static void close(Player player, AnvilInventory inventory) {
         final Object containerAnvil = Reflect.get(containerField, inventory);
         final Object entityPlayer = Reflect.invoke(getHandleCraftPlayer, player);
 

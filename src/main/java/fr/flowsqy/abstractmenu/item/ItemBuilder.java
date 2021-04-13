@@ -2,6 +2,7 @@ package fr.flowsqy.abstractmenu.item;
 
 import com.google.common.collect.Multimap;
 import fr.flo504.reflect.Reflect;
+import fr.flowsqy.abstractmenu.item.heads.HeadUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -13,6 +14,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,6 +30,8 @@ public class ItemBuilder {
     private int amount;
     private boolean unbreakable;
     private List<String> lore;
+    private String headDataTexture;
+    private String headDataSignature;
     private CreatorListener creatorListener;
 
     public ItemBuilder() {
@@ -46,6 +50,8 @@ public class ItemBuilder {
         this.enchants = new HashMap<>(builder.enchants());
         this.flags = new HashSet<>(builder.flags());
         this.attributes = new HashMap<>(builder.attributes);
+        this.headDataTexture = builder.headDataTexture;
+        this.headDataSignature = builder.headDataSignature;
         this.creatorListener = creatorListener();
     }
 
@@ -155,6 +161,13 @@ public class ItemBuilder {
             }
         }
 
+        final ConfigurationSection headDataSection = section.getConfigurationSection("head-data");
+        if (headDataSection != null) {
+            final String texture = headDataSection.getString("texture");
+            final String signature = headDataSection.getString("signature");
+            builder.headData(texture, signature);
+        }
+
         return builder;
     }
 
@@ -207,6 +220,11 @@ public class ItemBuilder {
             });
         }
 
+        if (itemBuilder.headDataTexture() != null && !itemBuilder.headDataTexture().isEmpty())
+            section.set("head-data.texture", itemBuilder.headDataTexture());
+
+        if (itemBuilder.headDataSignature() != null && !itemBuilder.headDataSignature().isEmpty())
+            section.set("head-data.signature", itemBuilder.headDataSignature());
     }
 
     public static void serialize(ConfigurationSection section, ItemStack itemStack) {
@@ -318,6 +336,20 @@ public class ItemBuilder {
         return this;
     }
 
+    public String headDataTexture() {
+        return headDataTexture;
+    }
+
+    public String headDataSignature() {
+        return headDataSignature;
+    }
+
+    public ItemBuilder headData(String texture, String signature) {
+        this.headDataTexture = texture;
+        this.headDataSignature = signature;
+        return this;
+    }
+
     public CreatorListener creatorListener() {
         return creatorListener;
     }
@@ -359,6 +391,15 @@ public class ItemBuilder {
             handledFlags.forEach(meta::addItemFlags);
         if (handledAttributes != null)
             handledAttributes.forEach(meta::addAttributeModifier);
+
+        if (
+                headDataTexture != null
+                        && material == Material.PLAYER_HEAD
+                        && !headDataTexture.isEmpty()
+                        && meta instanceof SkullMeta
+        ) {
+            HeadUtils.applyProfile((SkullMeta) meta, HeadUtils.getProfile(headDataTexture, headDataSignature));
+        }
 
         item.setItemMeta(meta);
 

@@ -7,15 +7,18 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
+import java.util.UUID;
 
 public class HeadUtils {
 
     private static final Field profileField;
+    private static final UUID genericUUID;
 
     static {
         final Class<?> cSkullMetaClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT + "inventory.CraftMetaSkull");
         profileField = Reflect.getField(cSkullMetaClass, "profile");
         profileField.setAccessible(true);
+        genericUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
     }
 
     public static void applyProfile(SkullMeta meta, GameProfile profile) {
@@ -24,7 +27,11 @@ public class HeadUtils {
     }
 
     public static GameProfile getProfile(String textures, String signature) {
-        final GameProfile profile = new GameProfile(null, "custom");
+        return getProfile(genericUUID, textures, signature);
+    }
+
+    public static GameProfile getProfile(UUID uuid, String textures, String signature) {
+        final GameProfile profile = new GameProfile(uuid, null);
         profile.getProperties().put("textures", new Property("textures", textures, signature));
         return profile;
     }

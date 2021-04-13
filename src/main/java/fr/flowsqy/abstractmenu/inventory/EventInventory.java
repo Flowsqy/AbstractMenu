@@ -1,7 +1,7 @@
-package fr.flo504.abstractmenu.inventory;
+package fr.flowsqy.abstractmenu.inventory;
 
-import fr.flo504.abstractmenu.factory.MenuFactory;
-import fr.flo504.abstractmenu.item.ItemBuilder;
+import fr.flowsqy.abstractmenu.factory.MenuFactory;
+import fr.flowsqy.abstractmenu.item.ItemBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;

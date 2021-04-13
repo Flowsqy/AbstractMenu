@@ -1,6 +1,6 @@
-package fr.flo504.abstractmenu.factory;
+package fr.flowsqy.abstractmenu.factory;
 
-import fr.flo504.abstractmenu.inventory.EventInventory;
+import fr.flowsqy.abstractmenu.inventory.EventInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

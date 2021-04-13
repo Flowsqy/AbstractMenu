@@ -1,4 +1,4 @@
-package fr.flo504.abstractmenu.item.heads;
+package fr.flowsqy.abstractmenu.item.heads;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;

@@ -1,4 +1,4 @@
-package fr.flo504.abstractmenu.item;
+package fr.flowsqy.abstractmenu.item;
 
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;

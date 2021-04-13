@@ -1,4 +1,4 @@
-package fr.flo504.abstractmenu;
+package fr.flowsqy.abstractmenu;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;

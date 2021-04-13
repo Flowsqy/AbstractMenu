@@ -1,6 +1,6 @@
 name: AbstractMenu
-author: Flo504
+author: Flowsqy
 version: ${project.version}
-main: fr.flo504.abstractmenu.AbstractMenuPlugin
+main: fr.flowsqy.abstractmenu.AbstractMenuPlugin
 api-version: "1.13"
 softdepend: [Reflect]

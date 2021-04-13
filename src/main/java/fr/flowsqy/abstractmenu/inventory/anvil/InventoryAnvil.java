@@ -1,4 +1,4 @@
-package fr.flo504.abstractmenu.inventory.anvil;
+package fr.flowsqy.abstractmenu.inventory.anvil;
 
 import fr.flo504.reflect.Reflect;
 import org.bukkit.entity.Player;

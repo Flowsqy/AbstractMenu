@@ -1,4 +1,4 @@
-package fr.flo504.abstractmenu.item;
+package fr.flowsqy.abstractmenu.item;
 
 import com.google.common.collect.Multimap;
 import fr.flo504.reflect.Reflect;

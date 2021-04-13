@@ -25,7 +25,7 @@ public class HeadUtils {
 
     public static GameProfile getProfile(String textures, String signature) {
         final GameProfile profile = new GameProfile(null, "custom");
-        profile.getProperties().put("textures", new Property(textures, signature));
+        profile.getProperties().put("textures", new Property("textures", textures, signature));
         return profile;
     }
 

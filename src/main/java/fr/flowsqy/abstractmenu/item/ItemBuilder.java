@@ -179,12 +179,15 @@ public class ItemBuilder {
 
         String name = itemBuilder.name();
 
-        if (name.startsWith(RESET_PATTERN))
-            name = name.replaceFirst(RESET_PATTERN, "");
+        if (name != null) {
+            if (name.startsWith(RESET_PATTERN))
+                name = name.replaceFirst(RESET_PATTERN, "");
 
-        name = name.replace(ChatColor.COLOR_CHAR, '&');
+            name = name.replace(ChatColor.COLOR_CHAR, '&');
 
-        section.set("name", name);
+            section.set("name", name);
+        }
+
         section.set("lore", itemBuilder.lore()
                 .stream()
                 .filter(Objects::nonNull)

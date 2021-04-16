@@ -304,9 +304,10 @@ public class EventInventory {
      * Open the inventory to a player in generic session
      *
      * @param player The targeted player
+     * @return The bukkit inventory involved
      */
-    public void open(Player player) {
-        open(player, GENERIC_SESSION_ID);
+    public Inventory open(Player player) {
+        return open(player, GENERIC_SESSION_ID);
     }
 
     /**
@@ -314,10 +315,12 @@ public class EventInventory {
      *
      * @param player    The targeted player
      * @param sessionId The session to open
+     * @return The bukkit inventory involved
      */
-    public void open(Player player, String sessionId) {
+    public Inventory open(Player player, String sessionId) {
         final Inventory inventory = factory.open(sessionId, this, line * 9, RESET_PATTERN + name);
         player.openInventory(inventory);
+        return inventory;
     }
 
     /**

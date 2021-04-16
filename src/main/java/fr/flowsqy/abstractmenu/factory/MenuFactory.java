@@ -1,5 +1,7 @@
 package fr.flowsqy.abstractmenu.factory;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import fr.flowsqy.abstractmenu.inventory.EventInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -11,23 +13,45 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class MenuFactory implements Listener {
 
     private final Map<Inventory, EventInventory> inventories;
+    private final BiMap<String, Inventory> sessions;
 
+    /**
+     * Construct an instance of MenuFactory which will handles all Inventory for the plugin
+     *
+     * @param plugin The plugin who create the factory
+     */
     public MenuFactory(Plugin plugin) {
         this.inventories = new HashMap<>();
-
+        this.sessions = HashBiMap.create();
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
-    public void register(Inventory inventory, EventInventory eventInventory) {
-        inventories.put(inventory, eventInventory);
+    /**
+     * Open an inventory
+     * Create or get the inventory associated to the session
+     *
+     * @param sessionId      The session id
+     * @param eventInventory The EventInventory related to this session
+     * @param line           The number of line
+     * @param name           The name of the inventory
+     * @return The bukkit inventory associated with this session
+     */
+    public Inventory open(String sessionId, EventInventory eventInventory, int line, String name) {
+        Objects.requireNonNull(sessionId);
+        Objects.requireNonNull(eventInventory);
+        Inventory inventory = sessions.get(sessionId);
+        if (inventory == null) {
+            inventory = Bukkit.createInventory(null, line, name);
+            eventInventory.refresh(inventory);
+            inventories.put(inventory, eventInventory);
+            sessions.put(sessionId, inventory);
+        }
+        return inventory;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -93,10 +117,17 @@ public class MenuFactory implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     private void handleClose(InventoryCloseEvent e) {
-        final EventInventory inventory = inventories.get(e.getInventory());
+        final Inventory inventory = e.getInventory();
+        final EventInventory eventInventory;
+        if (inventory.getViewers().size() == 1 && inventory.getViewers().get(0) == e.getPlayer()) {
+            eventInventory = inventories.remove(inventory);
+            sessions.inverse().remove(inventory);
+        } else {
+            eventInventory = inventories.get(inventory);
+        }
 
-        if (inventory != null)
-            inventory.onClose((Player) e.getPlayer());
+        if (eventInventory != null)
+            eventInventory.onClose((Player) e.getPlayer());
     }
 
 }

@@ -2,7 +2,6 @@ package fr.flowsqy.abstractmenu.inventory;
 
 import fr.flowsqy.abstractmenu.factory.MenuFactory;
 import fr.flowsqy.abstractmenu.item.ItemBuilder;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 
 public class EventInventory {
 
+    public final static String GENERIC_SESSION_ID = "GENERIC_SESSION_ID";
     public final static RegisterHandler REGISTER = (eventInventory, key, builder, slots) -> eventInventory.register(builder, slots);
     public final static RegisterHandler NOTHING = (eventInventory, key, builder, slots) -> {
     };
@@ -301,16 +301,22 @@ public class EventInventory {
     }
 
     /**
-     * Open the inventory to a player
+     * Open the inventory to a player in generic session
      *
      * @param player The targeted player
      */
     public void open(Player player) {
-        final Inventory inventory = Bukkit.createInventory(null, line * 9, RESET_PATTERN + name);
+        open(player, GENERIC_SESSION_ID);
+    }
 
-        slots.forEach((key, value) -> inventory.setItem(key, value.create()));
-
-        factory.register(inventory, this);
+    /**
+     * Open the inventory to a player in given session
+     *
+     * @param player    The targeted player
+     * @param sessionId The session to open
+     */
+    public void open(Player player, String sessionId) {
+        final Inventory inventory = factory.open(sessionId, this, line * 9, RESET_PATTERN + name);
         player.openInventory(inventory);
     }
 

@@ -28,10 +28,25 @@ public class EventInventory {
     private boolean transaction;
     private Consumer<Player> closeCallback;
 
+    /**
+     * Construct a new instance of EventInventory
+     *
+     * @param factory The factory for the plugin
+     * @param name    The name of the inventory
+     * @param line    The number of line in the inventory
+     */
     public EventInventory(MenuFactory factory, String name, int line) {
         this(factory, name, line, false);
     }
 
+    /**
+     * Construct a new instance of EventInventory
+     *
+     * @param factory     The factory for the plugin
+     * @param name        The name of the inventory
+     * @param line        The number of line the inventory
+     * @param transaction Allow or not transactions
+     */
     public EventInventory(MenuFactory factory, String name, int line, boolean transaction) {
         Objects.requireNonNull(factory);
         this.factory = factory;
@@ -42,6 +57,11 @@ public class EventInventory {
         this.transaction = transaction;
     }
 
+    /**
+     * Construct a new instance of EventInventory, used to clone
+     *
+     * @param eventInventory The EventInventory to copy
+     */
     public EventInventory(EventInventory eventInventory) {
         factory = eventInventory.factory;
         name = eventInventory.name;
@@ -54,6 +74,14 @@ public class EventInventory {
         closeCallback = eventInventory.closeCallback;
     }
 
+    /**
+     * Deserialize from a yaml configuration a EventInventory
+     *
+     * @param section         The configuration section where the inventory is stored
+     * @param factory         The factory for the plugin
+     * @param registerHandler The register handler to register items
+     * @return An instance of an EventInventory represented by the given Configuration Section
+     */
     public static EventInventory deserialize(ConfigurationSection section, MenuFactory factory, RegisterHandler registerHandler) {
         if (section == null)
             return null;
@@ -84,6 +112,12 @@ public class EventInventory {
         return eventInventory;
     }
 
+    /**
+     * Serialize a EventInventory in a Configuration Section
+     *
+     * @param section        The configuration section where it will be written
+     * @param eventInventory The EventInventory to write
+     */
     public static void serialize(ConfigurationSection section, EventInventory eventInventory) {
         Objects.requireNonNull(section);
         Objects.requireNonNull(eventInventory);
@@ -111,18 +145,38 @@ public class EventInventory {
         }
     }
 
+    /**
+     * Get the name of the inventory
+     *
+     * @return The name of the inventory
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Set the name of the inventory
+     *
+     * @param name The name of the inventory
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Get the number of line of the inventory
+     *
+     * @return The number of line of the inventory
+     */
     public int getLine() {
         return line;
     }
 
+    /**
+     * Set the number of line of the inventory
+     *
+     * @param line The number of line of the inventory
+     */
     public void setLine(int line) {
         if (line > 6)
             line = 6;
@@ -131,34 +185,80 @@ public class EventInventory {
         this.line = line;
     }
 
+    /**
+     * Get the transaction attribute
+     *
+     * @return true if allows transactions, false otherwise
+     */
     public boolean isTransaction() {
         return transaction;
     }
 
+    /**
+     * Set the transaction attribute
+     *
+     * @param transaction true if allows transactions, false otherwise
+     */
     public void setTransaction(boolean transaction) {
         this.transaction = transaction;
     }
 
+    /**
+     * Get the close callback consumer
+     *
+     * @return The close callback consumer
+     */
     public Consumer<Player> getCloseCallback() {
         return closeCallback;
     }
 
+    /**
+     * Set the close callback consumer
+     *
+     * @param closeCallback The close callback consumer
+     */
     public void setCloseCallback(Consumer<Player> closeCallback) {
         this.closeCallback = closeCallback;
     }
 
+    /**
+     * Register an item
+     *
+     * @param builder The item to register
+     * @param slots   The slots where the item must be
+     */
     public void register(ItemBuilder builder, Integer... slots) {
         register(builder, null, slots);
     }
 
+    /**
+     * Register an item with an event
+     *
+     * @param builder The item to register
+     * @param event   The event to register
+     * @param slots   The slot where the item and event must be
+     */
     public void register(ItemBuilder builder, Consumer<InventoryClickEvent> event, Integer... slots) {
         register(builder, event, Arrays.asList(slots));
     }
 
+    /**
+     * Register an item
+     *
+     * @param builder The item to register
+     * @param slots   The slots where the item must be
+     */
     public void register(ItemBuilder builder, List<Integer> slots) {
         register(builder, null, slots);
     }
 
+    /**
+     * Register an item with an event
+     *
+     * @param builder The item to register
+     * @param event   The event to register
+     * @param slots   The slot where the item and event must be
+     */
     public void register(ItemBuilder builder, Consumer<InventoryClickEvent> event, List<Integer> slots) {
         if (slots == null)
             return;
@@ -178,19 +278,33 @@ public class EventInventory {
         }
     }
 
+    /**
+     * Clear all item slots
+     */
     public void clearSlots() {
         this.slots.clear();
     }
 
+    /**
+     * Clear all event slots
+     */
     public void clearEvents() {
         this.events.clear();
     }
 
+    /**
+     * Clear all items and events
+     */
     public void clear() {
         clearSlots();
         clearEvents();
     }
 
+    /**
+     * Open the inventory to a player
+     *
+     * @param player The targeted player
+     */
     public void open(Player player) {
         final Inventory inventory = Bukkit.createInventory(null, line * 9, RESET_PATTERN + name);
 
@@ -200,10 +314,20 @@ public class EventInventory {
         player.openInventory(inventory);
     }
 
+    /**
+     * Refresh the targeted inventory
+     *
+     * @param inventory The targeted inventory
+     */
     public void refresh(Inventory inventory) {
         slots.forEach((key, value) -> inventory.setItem(key, value.create()));
     }
 
+    /**
+     * Refresh inventories
+     *
+     * @param inventories The targeted inventories
+     */
     public void refresh(Iterable<Inventory> inventories) {
         final Map<Integer, ItemStack> items = slots.entrySet().stream()
                 .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().create()))
@@ -213,11 +337,23 @@ public class EventInventory {
         }
     }
 
+    /**
+     * Invoke close callback
+     *
+     * @param player The player who close the inventory
+     */
     public void onClose(Player player) {
         if (closeCallback != null)
             closeCallback.accept(player);
     }
 
+    /**
+     * Handle a click
+     * The method redirect the event to the concerned event and/or cancel the click if transaction is not allowed
+     *
+     * @param rawSlot The clicked slot
+     * @param event   The bukkit event called
+     */
     public void onClick(int rawSlot, InventoryClickEvent event) {
         event.setCancelled(!isTransaction());
         final Consumer<InventoryClickEvent> eventHandler = events.get(rawSlot);
@@ -225,12 +361,28 @@ public class EventInventory {
             eventHandler.accept(event);
     }
 
+    /**
+     * The clone method
+     *
+     * @return A new instance of EventInventory, with the sames parameters
+     */
     public EventInventory clone() {
         return new EventInventory(this);
     }
 
+    /**
+     * A interface that handle the register process for deserialization
+     */
     public interface RegisterHandler {
 
+        /**
+         * Handle the item deserialization
+         *
+         * @param eventInventory The concerned EventInventory
+         * @param key            The key of the section of the item (which it used as an id)
+         * @param builder        The concerned item
+         * @param slots          The concerned slots
+         */
         void handle(EventInventory eventInventory, String key, ItemBuilder builder, List<Integer> slots);
 
     }

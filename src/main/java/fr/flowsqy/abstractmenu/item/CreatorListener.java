@@ -13,6 +13,9 @@ import java.util.Set;
 
 public interface CreatorListener {
 
+    default void open(Player player) {
+    }
+
     String handleName(Player player, String name);
 
     List<String> handleLore(Player player, List<String> lore);
@@ -32,5 +35,8 @@ public interface CreatorListener {
     String handleHeadDataTextures(Player player, String textures);
 
     String handleHeadDataSignature(Player player, String signature);
+
+    default void close(Player player) {
+    }
 
 }

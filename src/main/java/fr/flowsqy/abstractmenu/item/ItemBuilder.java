@@ -371,15 +371,21 @@ public class ItemBuilder {
         if (creatorListener == null)
             creatorListener = new CreatorAdaptor();
 
+        creatorListener.open(player);
+
         final Material handledMaterial = creatorListener.handleMaterial(player, material);
 
-        if (handledMaterial == null)
+        if (handledMaterial == null) {
+            creatorListener.close(player);
             return null;
+        }
 
         final ItemStack item = new ItemStack(handledMaterial, creatorListener.handleAmount(player, amount));
         final ItemMeta meta = item.getItemMeta();
-        if (meta == null) // Normally impossible
+        if (meta == null) { // Normally impossible
+            creatorListener.close(player);
             return item;
+        }
 
         meta.setDisplayName(creatorListener.handleName(player, name));
         meta.setUnbreakable(creatorListener.handleUnbreakable(player, unbreakable));
@@ -410,6 +416,8 @@ public class ItemBuilder {
         }
 
         item.setItemMeta(meta);
+
+        creatorListener.close(player);
 
         return item;
     }

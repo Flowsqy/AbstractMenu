@@ -39,15 +39,16 @@ public class MenuFactory implements Listener {
      * @param eventInventory The EventInventory related to this session
      * @param line           The number of line
      * @param name           The name of the inventory
+     * @param player         The player to handle the creator listener
      * @return The bukkit inventory associated with this session
      */
-    public Inventory open(String sessionId, EventInventory eventInventory, int line, String name) {
+    public Inventory open(String sessionId, EventInventory eventInventory, int line, String name, Player player) {
         Objects.requireNonNull(sessionId);
         Objects.requireNonNull(eventInventory);
         Inventory inventory = sessions.get(sessionId);
         if (inventory == null) {
             inventory = Bukkit.createInventory(null, line, name);
-            eventInventory.refresh(inventory);
+            eventInventory.refresh(player, inventory);
             inventories.put(inventory, eventInventory);
             sessions.put(sessionId, inventory);
         }
@@ -59,12 +60,13 @@ public class MenuFactory implements Listener {
      *
      * @param sessionId      The id of the session
      * @param eventInventory The EventInventory which manage items
+     * @param player         The player to handle the creator listener
      */
-    public void refresh(String sessionId, EventInventory eventInventory) {
+    public void refresh(String sessionId, EventInventory eventInventory, Player player) {
         Objects.requireNonNull(sessionId);
         final Inventory inventory = sessions.get(sessionId);
         if (inventory != null)
-            eventInventory.refresh(inventory);
+            eventInventory.refresh(player, inventory);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

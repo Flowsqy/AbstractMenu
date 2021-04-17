@@ -318,7 +318,13 @@ public class EventInventory {
      * @return The bukkit inventory involved
      */
     public Inventory open(Player player, String sessionId) {
-        final Inventory inventory = factory.open(sessionId, this, line * 9, RESET_PATTERN + name);
+        final Inventory inventory = factory.open(
+                sessionId,
+                this,
+                line * 9,
+                RESET_PATTERN + name,
+                player
+        );
         player.openInventory(inventory);
         return inventory;
     }
@@ -326,29 +332,32 @@ public class EventInventory {
     /**
      * Refresh the targeted inventory
      *
+     * @param player    The player to handle the creator listener
      * @param inventory The targeted inventory
      */
-    public void refresh(Inventory inventory) {
-        slots.forEach((key, value) -> inventory.setItem(key, value.create()));
+    public void refresh(Player player, Inventory inventory) {
+        slots.forEach((key, value) -> inventory.setItem(key, value.create(player)));
     }
 
     /**
      * Refresh a session
      *
      * @param sessionId The id of the session
+     * @param player    The player to handle the creator listener
      */
-    public void refresh(String sessionId) {
-        factory.refresh(sessionId, this);
+    public void refresh(String sessionId, Player player) {
+        factory.refresh(sessionId, this, player);
     }
 
     /**
      * Refresh inventories
      *
-     * @param inventories The targeted inventories
+     * @param player      The player to handle the creator listener
+     * @param inventories The inventories
      */
-    public void refresh(Iterable<Inventory> inventories) {
+    public void refresh(Player player, Iterable<Inventory> inventories) {
         final Map<Integer, ItemStack> items = slots.entrySet().stream()
-                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().create()))
+                .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().create(player)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         for (Inventory inventory : inventories) {
             items.forEach(inventory::setItem);

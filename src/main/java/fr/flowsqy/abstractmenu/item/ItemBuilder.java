@@ -10,6 +10,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -362,31 +363,31 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemStack create() {
-        return create(creatorListener);
+    public ItemStack create(Player player) {
+        return create(player, creatorListener);
     }
 
-    public ItemStack create(CreatorListener creatorListener) {
+    public ItemStack create(Player player, CreatorListener creatorListener) {
         if (creatorListener == null)
             creatorListener = new CreatorAdaptor();
 
-        final Material handledMaterial = creatorListener.handleMaterial(material);
+        final Material handledMaterial = creatorListener.handleMaterial(player, material);
 
         if (handledMaterial == null)
             return null;
 
-        final ItemStack item = new ItemStack(handledMaterial, creatorListener.handleAmount(amount));
+        final ItemStack item = new ItemStack(handledMaterial, creatorListener.handleAmount(player, amount));
         final ItemMeta meta = item.getItemMeta();
         if (meta == null) // Normally impossible
             return item;
 
-        meta.setDisplayName(creatorListener.handleName(name));
-        meta.setUnbreakable(creatorListener.handleUnbreakable(unbreakable));
-        meta.setLore(creatorListener.handleLore(lore));
+        meta.setDisplayName(creatorListener.handleName(player, name));
+        meta.setUnbreakable(creatorListener.handleUnbreakable(player, unbreakable));
+        meta.setLore(creatorListener.handleLore(player, lore));
 
-        final Map<Enchantment, Integer> handledEnchants = creatorListener.handleEnchants(enchants);
-        final Set<ItemFlag> handledFlags = creatorListener.handleFlags(flags);
-        final Map<Attribute, AttributeModifier> handledAttributes = creatorListener.handleAttributes(attributes);
+        final Map<Enchantment, Integer> handledEnchants = creatorListener.handleEnchants(player, enchants);
+        final Set<ItemFlag> handledFlags = creatorListener.handleFlags(player, flags);
+        final Map<Attribute, AttributeModifier> handledAttributes = creatorListener.handleAttributes(player, attributes);
 
         if (handledEnchants != null)
             handledEnchants.forEach((enchant, level) -> meta.addEnchant(enchant, level, true));
@@ -396,13 +397,13 @@ public class ItemBuilder {
             handledAttributes.forEach(meta::addAttributeModifier);
 
         if (handledMaterial == Material.PLAYER_HEAD && meta instanceof SkullMeta) {
-            final String handledHeadDataTextures = creatorListener.handleHeadDataTextures(headDataTexture);
+            final String handledHeadDataTextures = creatorListener.handleHeadDataTextures(player, headDataTexture);
             if (handledHeadDataTextures != null && !handledHeadDataTextures.isEmpty()) {
                 HeadUtils.applyProfile(
                         (SkullMeta) meta,
                         HeadUtils.getProfile(
                                 handledHeadDataTextures,
-                                creatorListener.handleHeadDataSignature(headDataSignature)
+                                creatorListener.handleHeadDataSignature(player, headDataSignature)
                         )
                 );
             }

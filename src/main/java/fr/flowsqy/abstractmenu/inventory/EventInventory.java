@@ -333,6 +333,15 @@ public class EventInventory {
     }
 
     /**
+     * Refresh a session
+     *
+     * @param sessionId The id of the session
+     */
+    public void refresh(String sessionId) {
+        factory.refresh(sessionId, this);
+    }
+
+    /**
      * Refresh inventories
      *
      * @param inventories The targeted inventories

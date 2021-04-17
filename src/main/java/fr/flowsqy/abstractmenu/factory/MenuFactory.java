@@ -54,6 +54,19 @@ public class MenuFactory implements Listener {
         return inventory;
     }
 
+    /**
+     * Refresh a session
+     *
+     * @param sessionId      The id of the session
+     * @param eventInventory The EventInventory which manage items
+     */
+    public void refresh(String sessionId, EventInventory eventInventory) {
+        Objects.requireNonNull(sessionId);
+        final Inventory inventory = sessions.get(sessionId);
+        if (inventory != null)
+            eventInventory.refresh(inventory);
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     private void handleClick(InventoryClickEvent e) {
         final Inventory inv = e.getInventory();

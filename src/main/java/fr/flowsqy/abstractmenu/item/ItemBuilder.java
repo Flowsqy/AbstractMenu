@@ -372,7 +372,7 @@ public class ItemBuilder {
 
         final Material handledMaterial = creatorListener.handleMaterial(material);
 
-        if (material == null)
+        if (handledMaterial == null)
             return null;
 
         final ItemStack item = new ItemStack(handledMaterial, creatorListener.handleAmount(amount));

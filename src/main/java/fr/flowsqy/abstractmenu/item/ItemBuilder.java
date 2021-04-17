@@ -395,13 +395,17 @@ public class ItemBuilder {
         if (handledAttributes != null)
             handledAttributes.forEach(meta::addAttributeModifier);
 
-        if (
-                headDataTexture != null
-                        && material == Material.PLAYER_HEAD
-                        && !headDataTexture.isEmpty()
-                        && meta instanceof SkullMeta
-        ) {
-            HeadUtils.applyProfile((SkullMeta) meta, HeadUtils.getProfile(headDataTexture, headDataSignature));
+        if (handledMaterial == Material.PLAYER_HEAD && meta instanceof SkullMeta) {
+            final String handledHeadDataTextures = creatorListener.handleHeadDataTextures(headDataTexture);
+            if (handledHeadDataTextures != null && !handledHeadDataTextures.isEmpty()) {
+                HeadUtils.applyProfile(
+                        (SkullMeta) meta,
+                        HeadUtils.getProfile(
+                                handledHeadDataTextures,
+                                creatorListener.handleHeadDataSignature(headDataSignature)
+                        )
+                );
+            }
         }
 
         item.setItemMeta(meta);

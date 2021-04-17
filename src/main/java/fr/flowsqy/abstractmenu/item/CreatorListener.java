@@ -28,4 +28,8 @@ public interface CreatorListener {
 
     Map<Attribute, AttributeModifier> handleAttributes(Map<Attribute, AttributeModifier> attributes);
 
+    String handleHeadDataTextures(String textures);
+
+    String handleHeadDataSignature(String signature);
+
 }

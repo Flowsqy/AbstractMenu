@@ -51,4 +51,14 @@ public class CreatorAdaptor implements CreatorListener {
     public Map<Attribute, AttributeModifier> handleAttributes(Map<Attribute, AttributeModifier> attributes) {
         return attributes;
     }
+
+    @Override
+    public String handleHeadDataTextures(String textures) {
+        return textures;
+    }
+
+    @Override
+    public String handleHeadDataSignature(String signature) {
+        return signature;
+    }
 }

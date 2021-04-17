@@ -69,4 +69,14 @@ public class CreatorCopy implements CreatorListener {
     public Map<Attribute, AttributeModifier> handleAttributes(Map<Attribute, AttributeModifier> attributes) {
         return original == null ? attributes : original.attributes();
     }
+
+    @Override
+    public String handleHeadDataTextures(String textures) {
+        return original == null ? textures : original.headDataTexture();
+    }
+
+    @Override
+    public String handleHeadDataSignature(String signature) {
+        return original == null ? signature : original.headDataSignature();
+    }
 }

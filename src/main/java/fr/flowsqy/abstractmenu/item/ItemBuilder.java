@@ -367,59 +367,62 @@ public class ItemBuilder {
         return create(player, creatorListener);
     }
 
-    public ItemStack create(Player player, CreatorListener creatorListener) {
+    public synchronized ItemStack create(Player player, CreatorListener creatorListener) {
         if (creatorListener == null)
             creatorListener = new CreatorAdaptor();
 
-        creatorListener.open(player);
+        // A little bit tricky but the variable can not change because the method is synchronized too
+        synchronized (creatorListener) {
+            creatorListener.open(player);
 
-        final Material handledMaterial = creatorListener.handleMaterial(player, material);
+            final Material handledMaterial = creatorListener.handleMaterial(player, material);
 
-        if (handledMaterial == null) {
+            if (handledMaterial == null) {
+                creatorListener.close(player);
+                return null;
+            }
+
+            final ItemStack item = new ItemStack(handledMaterial, creatorListener.handleAmount(player, amount));
+            final ItemMeta meta = item.getItemMeta();
+            if (meta == null) { // Normally impossible
+                creatorListener.close(player);
+                return item;
+            }
+
+            meta.setDisplayName(creatorListener.handleName(player, name));
+            meta.setUnbreakable(creatorListener.handleUnbreakable(player, unbreakable));
+            meta.setLore(creatorListener.handleLore(player, lore));
+
+            final Map<Enchantment, Integer> handledEnchants = creatorListener.handleEnchants(player, enchants);
+            final Set<ItemFlag> handledFlags = creatorListener.handleFlags(player, flags);
+            final Map<Attribute, AttributeModifier> handledAttributes = creatorListener.handleAttributes(player, attributes);
+
+            if (handledEnchants != null)
+                handledEnchants.forEach((enchant, level) -> meta.addEnchant(enchant, level, true));
+            if (handledFlags != null)
+                handledFlags.forEach(meta::addItemFlags);
+            if (handledAttributes != null)
+                handledAttributes.forEach(meta::addAttributeModifier);
+
+            if (handledMaterial == Material.PLAYER_HEAD && meta instanceof SkullMeta) {
+                final String handledHeadDataTextures = creatorListener.handleHeadDataTextures(player, headDataTexture);
+                if (handledHeadDataTextures != null && !handledHeadDataTextures.isEmpty()) {
+                    HeadUtils.applyProfile(
+                            (SkullMeta) meta,
+                            HeadUtils.getProfile(
+                                    handledHeadDataTextures,
+                                    creatorListener.handleHeadDataSignature(player, headDataSignature)
+                            )
+                    );
+                }
+            }
+
+            item.setItemMeta(meta);
+
             creatorListener.close(player);
-            return null;
-        }
 
-        final ItemStack item = new ItemStack(handledMaterial, creatorListener.handleAmount(player, amount));
-        final ItemMeta meta = item.getItemMeta();
-        if (meta == null) { // Normally impossible
-            creatorListener.close(player);
             return item;
         }
-
-        meta.setDisplayName(creatorListener.handleName(player, name));
-        meta.setUnbreakable(creatorListener.handleUnbreakable(player, unbreakable));
-        meta.setLore(creatorListener.handleLore(player, lore));
-
-        final Map<Enchantment, Integer> handledEnchants = creatorListener.handleEnchants(player, enchants);
-        final Set<ItemFlag> handledFlags = creatorListener.handleFlags(player, flags);
-        final Map<Attribute, AttributeModifier> handledAttributes = creatorListener.handleAttributes(player, attributes);
-
-        if (handledEnchants != null)
-            handledEnchants.forEach((enchant, level) -> meta.addEnchant(enchant, level, true));
-        if (handledFlags != null)
-            handledFlags.forEach(meta::addItemFlags);
-        if (handledAttributes != null)
-            handledAttributes.forEach(meta::addAttributeModifier);
-
-        if (handledMaterial == Material.PLAYER_HEAD && meta instanceof SkullMeta) {
-            final String handledHeadDataTextures = creatorListener.handleHeadDataTextures(player, headDataTexture);
-            if (handledHeadDataTextures != null && !handledHeadDataTextures.isEmpty()) {
-                HeadUtils.applyProfile(
-                        (SkullMeta) meta,
-                        HeadUtils.getProfile(
-                                handledHeadDataTextures,
-                                creatorListener.handleHeadDataSignature(player, headDataSignature)
-                        )
-                );
-            }
-        }
-
-        item.setItemMeta(meta);
-
-        creatorListener.close(player);
-
-        return item;
     }
 
     @Override

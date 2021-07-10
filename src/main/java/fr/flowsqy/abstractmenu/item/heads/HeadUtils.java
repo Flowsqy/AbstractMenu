@@ -2,7 +2,7 @@ package fr.flowsqy.abstractmenu.item.heads;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
-import fr.flo504.reflect.Reflect;
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
@@ -15,15 +15,23 @@ public class HeadUtils {
     private static final UUID genericUUID;
 
     static {
-        final Class<?> cSkullMetaClass = Reflect.getClass(Reflect.Commons.CRAFTBUKKIT + "inventory.CraftMetaSkull");
-        profileField = Reflect.getField(cSkullMetaClass, "profile");
-        profileField.setAccessible(true);
-        genericUUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+        try {
+            final Class<?> cSkullMetaClass = Class.forName(Bukkit.getServer().getClass().getPackage().getName() + ".inventory.CraftMetaSkull");
+            profileField = cSkullMetaClass.getDeclaredField("profile");
+            profileField.setAccessible(true);
+            genericUUID = new UUID(0L, 0L);
+        } catch (ClassNotFoundException | NoSuchFieldException e) {
+            throw new RuntimeException();
+        }
     }
 
     public static void applyProfile(SkullMeta meta, GameProfile profile) {
         Objects.requireNonNull(meta);
-        Reflect.set(profileField, meta, profile);
+        try {
+            profileField.set(meta, profile);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static GameProfile getProfile(String textures, String signature) {

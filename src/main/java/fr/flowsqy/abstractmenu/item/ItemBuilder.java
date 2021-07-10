@@ -1,7 +1,6 @@
 package fr.flowsqy.abstractmenu.item;
 
 import com.google.common.collect.Multimap;
-import fr.flo504.reflect.Reflect;
 import fr.flowsqy.abstractmenu.item.heads.HeadUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -61,7 +60,7 @@ public class ItemBuilder {
 
         final ItemBuilder builder = new ItemBuilder();
 
-        builder.material(Reflect.getEnumConstant(Material.class, section.getString("type")));
+        builder.material(getEnumConstant(Material.class, section.getString("type")));
 
         String name = section.getString("name");
         if (name != null) {
@@ -109,7 +108,7 @@ public class ItemBuilder {
 
         final List<String> flags = section.getStringList("flags");
         for (String flagString : flags) {
-            final ItemFlag flag = Reflect.getEnumConstant(ItemFlag.class, flagString);
+            final ItemFlag flag = getEnumConstant(ItemFlag.class, flagString);
             builder.flags(flag);
         }
 
@@ -120,20 +119,16 @@ public class ItemBuilder {
                 if (attributeSection == null)
                     continue;
 
-                final Attribute attribute = Reflect.getEnumConstant(Attribute.class, attributeKey);
+                final Attribute attribute = getEnumConstant(Attribute.class, attributeKey);
                 if (attribute == null)
                     continue;
 
                 final String rawUuid = attributeSection.getString("uuid", "");
                 UUID uuid;
-                if (rawUuid == null || rawUuid.split("-").length != 5)
+                try {
+                    uuid = UUID.fromString(rawUuid);
+                } catch (Exception ignored) {
                     uuid = UUID.randomUUID();
-                else {
-                    try {
-                        uuid = UUID.fromString(rawUuid);
-                    } catch (NumberFormatException ignored) {
-                        uuid = UUID.randomUUID();
-                    }
                 }
                 final String modifierName = attributeSection.getString("name");
                 if (modifierName == null)
@@ -150,11 +145,11 @@ public class ItemBuilder {
                 }
 
                 final String operationString = attributeSection.getString("operation");
-                final AttributeModifier.Operation operation = Reflect.getEnumConstant(AttributeModifier.Operation.class, operationString);
+                final AttributeModifier.Operation operation = getEnumConstant(AttributeModifier.Operation.class, operationString);
                 if (operation == null)
                     continue;
 
-                final EquipmentSlot slot = Reflect.getEnumConstant(EquipmentSlot.class, attributeSection.getString("slot"));
+                final EquipmentSlot slot = getEnumConstant(EquipmentSlot.class, attributeSection.getString("slot"));
 
                 final AttributeModifier modifier = new AttributeModifier(uuid, modifierName, modifierAmount, operation, slot);
 
@@ -170,6 +165,20 @@ public class ItemBuilder {
         }
 
         return builder;
+    }
+
+    private static <T extends Enum<T>> T getEnumConstant(Class<T> enumClass, String value) {
+        if (enumClass == null || value == null)
+            return null;
+
+        value = value.trim().toUpperCase();
+
+        for (final T constant : enumClass.getEnumConstants()) {
+            if (constant.name().equals(value))
+                return constant;
+        }
+
+        return null;
     }
 
     public static void serialize(ConfigurationSection section, ItemBuilder itemBuilder) {

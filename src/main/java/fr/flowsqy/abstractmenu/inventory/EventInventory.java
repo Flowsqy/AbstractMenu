@@ -15,11 +15,11 @@ import java.util.stream.Collectors;
 
 public class EventInventory {
 
-    public final static String GENERIC_SESSION_ID = "GENERIC_SESSION_ID";
     public final static RegisterHandler REGISTER = (eventInventory, key, builder, slots) -> eventInventory.register(builder, slots);
     public final static RegisterHandler NOTHING = (eventInventory, key, builder, slots) -> {
     };
     private static final String RESET_PATTERN = ChatColor.WHITE.toString();
+    private final UUID uuid;
     private final MenuFactory factory;
     private final Map<Integer, ItemBuilder> slots;
     private final Map<Integer, Consumer<InventoryClickEvent>> events;
@@ -49,6 +49,7 @@ public class EventInventory {
      */
     public EventInventory(MenuFactory factory, String name, int line, boolean transaction) {
         Objects.requireNonNull(factory);
+        this.uuid = UUID.randomUUID();
         this.factory = factory;
         this.name = name;
         setLine(line);
@@ -63,6 +64,7 @@ public class EventInventory {
      * @param eventInventory The EventInventory to copy
      */
     public EventInventory(EventInventory eventInventory) {
+        uuid = eventInventory.uuid;
         factory = eventInventory.factory;
         name = eventInventory.name;
         line = eventInventory.line;
@@ -307,7 +309,7 @@ public class EventInventory {
      * @return The bukkit inventory involved
      */
     public Inventory open(Player player) {
-        return open(player, GENERIC_SESSION_ID);
+        return open(player, uuid);
     }
 
     /**
@@ -317,7 +319,7 @@ public class EventInventory {
      * @param sessionId The session to open
      * @return The bukkit inventory involved
      */
-    public Inventory open(Player player, String sessionId) {
+    public Inventory open(Player player, UUID sessionId) {
         final Inventory inventory = factory.open(
                 sessionId,
                 this,
@@ -345,7 +347,7 @@ public class EventInventory {
      * @param sessionId The id of the session
      * @param player    The player to handle the creator listener
      */
-    public void refresh(String sessionId, Player player) {
+    public void refresh(UUID sessionId, Player player) {
         factory.refresh(sessionId, this, player);
     }
 
@@ -398,7 +400,7 @@ public class EventInventory {
     }
 
     /**
-     * A interface that handle the register process for deserialization
+     * An interface that handle the register process for deserialization
      */
     public interface RegisterHandler {
 

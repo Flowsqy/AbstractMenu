@@ -18,7 +18,7 @@ import java.util.*;
 public class MenuFactory implements Listener {
 
     private final Map<Inventory, EventInventory> inventories;
-    private final BiMap<String, Inventory> sessions;
+    private final BiMap<UUID, Inventory> sessions;
 
     /**
      * Construct an instance of MenuFactory which will handles all Inventory for the plugin
@@ -42,7 +42,7 @@ public class MenuFactory implements Listener {
      * @param player         The player to handle the creator listener
      * @return The bukkit inventory associated with this session
      */
-    public Inventory open(String sessionId, EventInventory eventInventory, int line, String name, Player player) {
+    public Inventory open(UUID sessionId, EventInventory eventInventory, int line, String name, Player player) {
         Objects.requireNonNull(sessionId);
         Objects.requireNonNull(eventInventory);
         Inventory inventory = sessions.get(sessionId);
@@ -62,7 +62,7 @@ public class MenuFactory implements Listener {
      * @param eventInventory The EventInventory which manage items
      * @param player         The player to handle the creator listener
      */
-    public void refresh(String sessionId, EventInventory eventInventory, Player player) {
+    public void refresh(UUID sessionId, EventInventory eventInventory, Player player) {
         Objects.requireNonNull(sessionId);
         final Inventory inventory = sessions.get(sessionId);
         if (inventory != null)

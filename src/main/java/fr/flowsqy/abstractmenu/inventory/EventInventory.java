@@ -21,8 +21,8 @@ public class EventInventory {
     private static final String RESET_PATTERN = ChatColor.WHITE.toString();
     private final UUID uuid;
     private final MenuFactory factory;
-    private final Map<Integer, ItemBuilder> slots;
-    private final Map<Integer, Consumer<InventoryClickEvent>> events;
+    private final Map<Integer, ItemBuilder> slotToItem;
+    private final Map<Integer, Consumer<InventoryClickEvent>> slotToEvent;
     private String name;
     private int line;
     private boolean transaction;
@@ -53,8 +53,8 @@ public class EventInventory {
         this.factory = factory;
         this.name = name;
         setLine(line);
-        this.slots = new HashMap<>();
-        this.events = new HashMap<>();
+        this.slotToItem = new HashMap<>();
+        this.slotToEvent = new HashMap<>();
         this.transaction = transaction;
     }
 
@@ -68,10 +68,10 @@ public class EventInventory {
         factory = eventInventory.factory;
         name = eventInventory.name;
         line = eventInventory.line;
-        slots = eventInventory.slots.entrySet().stream()
+        slotToItem = eventInventory.slotToItem.entrySet().stream()
                 .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().clone()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        events = eventInventory.events;
+        slotToEvent = eventInventory.slotToEvent;
         transaction = eventInventory.transaction;
         closeCallback = eventInventory.closeCallback;
     }
@@ -85,33 +85,7 @@ public class EventInventory {
      * @return An instance of an EventInventory represented by the given Configuration Section
      */
     public static EventInventory deserialize(ConfigurationSection section, MenuFactory factory, RegisterHandler registerHandler) {
-        if (section == null)
-            return null;
-
-        String name = section.getString("name");
-        if (name != null)
-            name = ChatColor.translateAlternateColorCodes('&', name);
-        final int line = section.getInt("line");
-
-        final EventInventory eventInventory = new EventInventory(factory, name, line);
-
-        final ConfigurationSection slotsSection = section.getConfigurationSection("items");
-
-        if (slotsSection != null && registerHandler != null) {
-            for (String keySubSection : slotsSection.getKeys(false)) {
-                final ConfigurationSection slotSection = slotsSection.getConfigurationSection(keySubSection);
-                if (slotSection == null) // Normally impossible
-                    continue;
-                final List<Integer> rawSlots = slotSection.getIntegerList("slots");
-                final ConfigurationSection itemSection = slotSection.getConfigurationSection("item");
-
-                final ItemBuilder builder = itemSection == null ? null : ItemBuilder.deserialize(itemSection);
-
-                registerHandler.handle(eventInventory, keySubSection, builder, rawSlots);
-            }
-        }
-
-        return eventInventory;
+        return EventInventorySerializer.deserialize(section, factory, registerHandler);
     }
 
     /**
@@ -121,30 +95,16 @@ public class EventInventory {
      * @param eventInventory The EventInventory to write
      */
     public static void serialize(ConfigurationSection section, EventInventory eventInventory) {
-        Objects.requireNonNull(section);
-        Objects.requireNonNull(eventInventory);
+        EventInventorySerializer.serialize(section, eventInventory);
+    }
 
-        section.set("name", eventInventory.getName().replace(ChatColor.COLOR_CHAR, '&'));
-        section.set("line", eventInventory.getLine());
-
-        final Map<ItemBuilder, List<Integer>> slots = new HashMap<>();
-        for (Map.Entry<Integer, ItemBuilder> entry : eventInventory.slots.entrySet()) {
-            List<Integer> rawSlots = slots.get(entry.getValue());
-            if (rawSlots == null)
-                rawSlots = new ArrayList<>();
-            rawSlots.add(entry.getKey());
-            slots.put(entry.getValue(), rawSlots);
-        }
-
-        final ConfigurationSection slotsSection = section.createSection("items");
-
-        int index = 0;
-        for (Map.Entry<ItemBuilder, List<Integer>> entry : slots.entrySet()) {
-            final ConfigurationSection slotSection = slotsSection.createSection(String.valueOf(index));
-            ItemBuilder.serialize(slotSection.createSection("item"), entry.getKey());
-            slotSection.set("slots", entry.getValue());
-            index++;
-        }
+    /**
+     * Get slot to item map. Use for implementation
+     *
+     * @return The slot to item {@link Map}
+     */
+    Map<Integer, ItemBuilder> getSlotToItem() {
+        return slotToItem;
     }
 
     /**
@@ -274,9 +234,9 @@ public class EventInventory {
             if (slot >= slotCount && slotCount >= 0)
                 continue;
             if (builder != null)
-                this.slots.put(slot, builder);
+                this.slotToItem.put(slot, builder);
             if (event != null)
-                this.events.put(slot, event);
+                this.slotToEvent.put(slot, event);
         }
     }
 
@@ -284,14 +244,14 @@ public class EventInventory {
      * Clear all item slots
      */
     public void clearSlots() {
-        this.slots.clear();
+        this.slotToItem.clear();
     }
 
     /**
      * Clear all event slots
      */
     public void clearEvents() {
-        this.events.clear();
+        this.slotToEvent.clear();
     }
 
     /**
@@ -338,7 +298,7 @@ public class EventInventory {
      * @param inventory The targeted inventory
      */
     public void refresh(Player player, Inventory inventory) {
-        slots.forEach((key, value) -> inventory.setItem(key, value.create(player)));
+        slotToItem.forEach((key, value) -> inventory.setItem(key, value.create(player)));
     }
 
     /**
@@ -358,7 +318,7 @@ public class EventInventory {
      * @param inventories The inventories
      */
     public void refresh(Player player, Iterable<Inventory> inventories) {
-        final Map<Integer, ItemStack> items = slots.entrySet().stream()
+        final Map<Integer, ItemStack> items = slotToItem.entrySet().stream()
                 .map(entry -> new AbstractMap.SimpleEntry<>(entry.getKey(), entry.getValue().create(player)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         for (Inventory inventory : inventories) {
@@ -385,7 +345,7 @@ public class EventInventory {
      */
     public void onClick(int rawSlot, InventoryClickEvent event) {
         event.setCancelled(!isTransaction());
-        final Consumer<InventoryClickEvent> eventHandler = events.get(rawSlot);
+        final Consumer<InventoryClickEvent> eventHandler = slotToEvent.get(rawSlot);
         if (eventHandler != null)
             eventHandler.accept(event);
     }

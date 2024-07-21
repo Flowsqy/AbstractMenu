@@ -39,7 +39,7 @@ public class HeadUtils {
     }
 
     public static GameProfile getProfile(UUID uuid, String textures, String signature) {
-        final GameProfile profile = new GameProfile(uuid, null);
+        final GameProfile profile = new GameProfile(uuid, "");
         profile.getProperties().put("textures", new Property("textures", textures, signature));
         return profile;
     }

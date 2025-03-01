@@ -1,15 +1,15 @@
 package fr.flowsqy.abstractmenu.item;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class CreatorCopy implements CreatorListener {
 
@@ -67,17 +67,14 @@ public class CreatorCopy implements CreatorListener {
     }
 
     @Override
-    public Map<Attribute, AttributeModifier> handleAttributes(Player player, Map<Attribute, AttributeModifier> attributes) {
+    public Map<Attribute, AttributeModifier> handleAttributes(Player player,
+            Map<Attribute, AttributeModifier> attributes) {
         return original == null ? attributes : original.attributes();
     }
 
     @Override
-    public String handleHeadDataTextures(Player player, String textures) {
-        return original == null ? textures : original.headDataTexture();
+    public HeadData handleHeadData(Player player, HeadData headData) {
+        return original == null ? headData : original.headData();
     }
 
-    @Override
-    public String handleHeadDataSignature(Player player, String signature) {
-        return original == null ? signature : original.headDataSignature();
-    }
 }

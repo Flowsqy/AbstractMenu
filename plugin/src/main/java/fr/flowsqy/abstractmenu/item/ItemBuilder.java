@@ -1,7 +1,17 @@
 package fr.flowsqy.abstractmenu.item;
 
-import com.google.common.collect.Multimap;
-import fr.flowsqy.abstractmenu.item.heads.HeadUtils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -13,7 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import java.util.*;
+import com.google.common.collect.Multimap;
 
 public class ItemBuilder {
 
@@ -25,8 +35,7 @@ public class ItemBuilder {
     private int amount;
     private boolean unbreakable;
     private List<String> lore;
-    private String headDataTexture;
-    private String headDataSignature;
+    private HeadData headData;
     private CreatorListener creatorListener;
 
     public ItemBuilder() {
@@ -45,8 +54,7 @@ public class ItemBuilder {
         this.enchants = new HashMap<>(builder.enchants());
         this.flags = new HashSet<>(builder.flags());
         this.attributes = new HashMap<>(builder.attributes);
-        this.headDataTexture = builder.headDataTexture;
-        this.headDataSignature = builder.headDataSignature;
+        this.headData = builder.headData;
         this.creatorListener = creatorListener();
     }
 
@@ -84,6 +92,16 @@ public class ItemBuilder {
         final Multimap<Attribute, AttributeModifier> attributes = meta.getAttributeModifiers();
         if (attributes != null)
             attributes.forEach(builder::attributes);
+
+        if (meta instanceof SkullMeta skullMeta) {
+            final var ownerProfile = skullMeta.getOwnerProfile();
+            if (ownerProfile != null) {
+                final var skinURL = ownerProfile.getTextures().getSkin();
+                if (skinURL != null) {
+                    builder.headData = new HeadData(ownerProfile.getUniqueId(), ownerProfile.getName(), skinURL);
+                }
+            }
+        }
 
         return builder;
     }
@@ -167,17 +185,12 @@ public class ItemBuilder {
         return this;
     }
 
-    public String headDataTexture() {
-        return headDataTexture;
+    public HeadData headData() {
+        return headData;
     }
 
-    public String headDataSignature() {
-        return headDataSignature;
-    }
-
-    public ItemBuilder headData(String texture, String signature) {
-        this.headDataTexture = texture;
-        this.headDataSignature = signature;
+    public ItemBuilder headData(HeadData headData) {
+        this.headData = headData;
         return this;
     }
 
@@ -198,7 +211,8 @@ public class ItemBuilder {
         if (creatorListener == null)
             creatorListener = new CreatorAdaptor();
 
-        // A little tricky but the variable can not changed because the method is synchronized too
+        // A little tricky but the variable can not changed because the method is
+        // synchronized too
         synchronized (creatorListener) {
             creatorListener.open(player);
 
@@ -222,7 +236,8 @@ public class ItemBuilder {
 
             final Map<Enchantment, Integer> handledEnchants = creatorListener.handleEnchants(player, enchants);
             final Set<ItemFlag> handledFlags = creatorListener.handleFlags(player, flags);
-            final Map<Attribute, AttributeModifier> handledAttributes = creatorListener.handleAttributes(player, attributes);
+            final Map<Attribute, AttributeModifier> handledAttributes = creatorListener.handleAttributes(player,
+                    attributes);
 
             if (handledEnchants != null)
                 handledEnchants.forEach((enchant, level) -> meta.addEnchant(enchant, level, true));
@@ -231,16 +246,14 @@ public class ItemBuilder {
             if (handledAttributes != null)
                 handledAttributes.forEach(meta::addAttributeModifier);
 
-            if (handledMaterial == Material.PLAYER_HEAD && meta instanceof SkullMeta) {
-                final String handledHeadDataTextures = creatorListener.handleHeadDataTextures(player, headDataTexture);
-                if (handledHeadDataTextures != null && !handledHeadDataTextures.isEmpty()) {
-                    HeadUtils.applyProfile(
-                            (SkullMeta) meta,
-                            HeadUtils.getProfile(
-                                    handledHeadDataTextures,
-                                    creatorListener.handleHeadDataSignature(player, headDataSignature)
-                            )
-                    );
+            if (handledMaterial == Material.PLAYER_HEAD && meta instanceof SkullMeta skullMeta) {
+                final var handledHeadData = creatorListener.handleHeadData(player, headData);
+                if (handledHeadData != null) {
+                    final var id = handledHeadData.id() == null ? new UUID(0xFFFFFF, 0xFFFFFF) : handledHeadData.id();
+                    final var name = handledHeadData.name() == null ? "AbstractMenu" : handledHeadData.name();
+                    final var profile = Bukkit.createPlayerProfile(id, name);
+                    profile.getTextures().setSkin(handledHeadData.textureURL());
+                    skullMeta.setOwnerProfile(profile);
                 }
             }
 

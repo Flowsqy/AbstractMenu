@@ -1,5 +1,10 @@
 package fr.flowsqy.abstractmenu.item;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -9,20 +14,14 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemBuilderSerializer {
 
     private final static String RESET_PATTERN = ChatColor.RESET.toString() + ChatColor.WHITE;
 
-    public static void serialize(ConfigurationSection section, ItemBuilder itemBuilder) {
-        Objects.requireNonNull(section);
-        Objects.requireNonNull(itemBuilder);
-
+    public static void serialize(@NotNull ConfigurationSection section, @NotNull ItemBuilder itemBuilder) {
         section.set("type", itemBuilder.material().name());
 
         String name = itemBuilder.name();
@@ -45,8 +44,7 @@ public class ItemBuilderSerializer {
                     line = line.replace(ChatColor.COLOR_CHAR, '&');
                     return line;
                 })
-                .collect(Collectors.toList())
-        );
+                .collect(Collectors.toList()));
         section.set("amount", itemBuilder.amount());
         section.set("unbreakable", itemBuilder.unbreakable());
         if (!itemBuilder.enchants().isEmpty()) {
@@ -57,8 +55,7 @@ public class ItemBuilderSerializer {
             section.set("flags", itemBuilder.flags().stream()
                     .filter(Objects::nonNull)
                     .map(ItemFlag::name)
-                    .collect(Collectors.toList()
-                    ));
+                    .collect(Collectors.toList()));
         if (!itemBuilder.attributes().isEmpty()) {
             final ConfigurationSection attributeSection = section.createSection("attributes");
             itemBuilder.attributes().forEach((attribute, modifier) -> {
@@ -71,11 +68,17 @@ public class ItemBuilderSerializer {
             });
         }
 
-        if (itemBuilder.headDataTexture() != null && !itemBuilder.headDataTexture().isEmpty())
-            section.set("head-data.texture", itemBuilder.headDataTexture());
-
-        if (itemBuilder.headDataSignature() != null && !itemBuilder.headDataSignature().isEmpty())
-            section.set("head-data.signature", itemBuilder.headDataSignature());
+        final var headData = itemBuilder.headData();
+        if (headData != null) {
+            final var headDataSection = section.createSection("head-data");
+            headDataSection.set("url", headData.textureURL().toExternalForm());
+            if (headData.id() != null) {
+                headDataSection.set("id", headData.id());
+            }
+            if (headData.name() != null) {
+                headDataSection.set("name", headData.name());
+            }
+        }
     }
 
     public static ItemBuilder deserialize(ConfigurationSection section) {
@@ -168,13 +171,15 @@ public class ItemBuilderSerializer {
                 }
 
                 final String operationString = attributeSection.getString("operation");
-                final AttributeModifier.Operation operation = getEnumConstant(AttributeModifier.Operation.class, operationString);
+                final AttributeModifier.Operation operation = getEnumConstant(AttributeModifier.Operation.class,
+                        operationString);
                 if (operation == null)
                     continue;
 
                 final EquipmentSlot slot = getEnumConstant(EquipmentSlot.class, attributeSection.getString("slot"));
 
-                final AttributeModifier modifier = new AttributeModifier(uuid, modifierName, modifierAmount, operation, slot);
+                final AttributeModifier modifier = new AttributeModifier(uuid, modifierName, modifierAmount, operation,
+                        slot);
 
                 builder.attributes(attribute, modifier);
             }
@@ -182,14 +187,16 @@ public class ItemBuilderSerializer {
 
         final ConfigurationSection headDataSection = section.getConfigurationSection("head-data");
         if (headDataSection != null) {
+            // TODO Deserialize correctly textures
             final String texture = headDataSection.getString("texture");
             final String signature = headDataSection.getString("signature");
-            builder.headData(texture, signature);
+            // builder.headData(texture, signature);
         }
 
         return builder;
     }
 
+    @Nullable
     private static <T extends Enum<T>> T getEnumConstant(Class<T> enumClass, String value) {
         if (enumClass == null || value == null)
             return null;

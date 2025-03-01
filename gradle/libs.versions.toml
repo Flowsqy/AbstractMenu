@@ -1,0 +1,9 @@
+[versions]
+mojang-authlib = "2.3.31"
+jetbrains-annotations = "26.0.2"
+spigot-api = "1.19.3-R0.1-SNAPSHOT"
+
+[libraries]
+mojang-authlib = { module = "com.mojang:authlib", version.ref = "mojang-authlib" }
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
+spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot-api" }

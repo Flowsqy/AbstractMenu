@@ -1,5 +1,5 @@
 name: AbstractMenu
 author: Flowsqy
-version: "${project.version}"
+version: "${version}"
 main: fr.flowsqy.abstractmenu.AbstractMenuPlugin
 api-version: "1.13"

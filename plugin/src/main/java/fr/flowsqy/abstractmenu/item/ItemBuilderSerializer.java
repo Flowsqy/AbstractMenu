@@ -13,6 +13,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +23,7 @@ public class ItemBuilderSerializer {
     private final static String RESET_PATTERN = ChatColor.RESET.toString() + ChatColor.WHITE;
 
     public static void serialize(@NotNull ConfigurationSection section, @NotNull ItemBuilder itemBuilder) {
-        section.set("type", itemBuilder.material().name());
+        section.set("type", itemBuilder.material().getKey().toString());
 
         String name = itemBuilder.name();
 
@@ -49,7 +50,13 @@ public class ItemBuilderSerializer {
         section.set("unbreakable", itemBuilder.unbreakable());
         if (!itemBuilder.enchants().isEmpty()) {
             final ConfigurationSection enchantSection = section.createSection("enchants");
-            itemBuilder.enchants().forEach((enchant, level) -> enchantSection.set(enchant.getKey().getKey(), level));
+            int index = 0;
+            for (var enchant : itemBuilder.enchants().entrySet()) {
+                index++;
+                final var nEnchantSection = enchantSection.createSection("enchant-" + index);
+                nEnchantSection.set("enchant", enchant.getKey().getKey().toString());
+                nEnchantSection.set("level", enchant.getValue());
+            }
         }
         if (!itemBuilder.flags().isEmpty())
             section.set("flags", itemBuilder.flags().stream()
@@ -60,11 +67,13 @@ public class ItemBuilderSerializer {
             final ConfigurationSection attributeSection = section.createSection("attributes");
             itemBuilder.attributes().forEach((attribute, modifier) -> {
                 final ConfigurationSection subSection = attributeSection.createSection(attribute.name().toLowerCase());
-                subSection.set("uuid", modifier.getUniqueId().toString());
-                subSection.set("name", modifier.getName());
+                subSection.set("attribute", modifier.getKey().toString());
                 subSection.set("amount", modifier.getAmount());
                 subSection.set("operation", modifier.getOperation().name());
-                subSection.set("slot", modifier.getSlot() != null ? modifier.getSlot().name() : null);
+                final var slotGroup = modifier.getSlotGroup();
+                if (slotGroup != null) {
+                    subSection.set("slot-group", getSlotGroupName(slotGroup));
+                }
             });
         }
 
@@ -196,8 +205,39 @@ public class ItemBuilderSerializer {
         return builder;
     }
 
+    private static String getSlotGroupName(@NotNull EquipmentSlotGroup slotGroup) {
+        if (slotGroup == EquipmentSlotGroup.ANY) {
+            return "any";
+        }
+        if (slotGroup == EquipmentSlotGroup.ARMOR) {
+            return "armor";
+        }
+        if (slotGroup == EquipmentSlotGroup.CHEST) {
+            return "chest";
+        }
+        if (slotGroup == EquipmentSlotGroup.FEET) {
+            return "feet";
+        }
+        if (slotGroup == EquipmentSlotGroup.HAND) {
+            return "hand";
+        }
+        if (slotGroup == EquipmentSlotGroup.HEAD) {
+            return "head";
+        }
+        if (slotGroup == EquipmentSlotGroup.LEGS) {
+            return "legs";
+        }
+        if (slotGroup == EquipmentSlotGroup.MAINHAND) {
+            return "mainhand";
+        }
+        if (slotGroup == EquipmentSlotGroup.OFFHAND) {
+            return "offhand";
+        }
+        return "any";
+    }
+
     @Nullable
-    private static <T extends Enum<T>> T getEnumConstant(Class<T> enumClass, String value) {
+    private static <T extends Enum<T>> T agetEnumConstant(Class<T> enumClass, String value) {
         if (enumClass == null || value == null)
             return null;
 

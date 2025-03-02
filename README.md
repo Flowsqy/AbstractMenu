@@ -18,8 +18,12 @@ configuration format to allow simple yaml configuration for servers owners.
   unbreakable: <unbreakable>
   amount: <amount>
   enchants:
-    <enchant-1>: <enchant-level>
-    <enchant-2>: <enchant-level>
+    <enchant-1>:
+      enchant: <enchant-name>
+      level: <enchant-level>
+    <enchant-2>:
+      enchant: <enchant-name>
+      level: <enchant-level>
     ...
   flags:
     - <flag-1>
@@ -27,21 +31,21 @@ configuration format to allow simple yaml configuration for servers owners.
     - ...
   attributes:
     <attribute-1>:
-      uuid: <attribute-uuid>
-      name: <attribute-name>
+      attribute: <attribute-name>
       amount: <attribute-amount>
       operation: <attribute-operation>
-      slot: <attribute-slot>
+      slot-group: <attribute-slot>
     <attribute-2>:
       ...
   head-data:
-    texture: <head-texture>
-    signature: <head-signature>
+    id: <head-id>
+    name: <head-name>
+    url: <head-url>
 
 # Where:
 #
 # <key> is the root key
-# <material> [https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html] :
+# <material> [https://minecraft.wiki/w/Java_Edition_data_values#Blocks] :
 #   The material of the item. Set it to null will create an empty item
 # <name> [String] : is the name. It supports colors
 # <line-n> [String] : is a line from the lore of the item. It supports colors
@@ -49,8 +53,10 @@ configuration format to allow simple yaml configuration for servers owners.
 # <amount> [integer] : The number of item
 #
 # Enchantments:
-# <enchant-n> [https://hub.spigotmc.org/javadocs/spigot/org/bukkit/enchantments/Enchantment.html] :
-#   An enchantment to apply.
+# <enchant-n> [Section] :
+#   An enchantment to apply. The section name does not matter.
+# <enchant-name> [https://minecraft.wiki/w/Java_Edition_data_values#Enchantments] : 
+#   The enchant name
 # <enchant-level> [integer] : The enchantment level
 #
 # Flags: 
@@ -58,21 +64,22 @@ configuration format to allow simple yaml configuration for servers owners.
 #   An item flag to apply (e.g. to hide enchants)
 #
 # Attribute:
-# <attribute-n> [https://hub.spigotmc.org/javadocs/spigot/org/bukkit/attribute/Attribute.html] :
+# <attribute-n> [String] : The name of this attribute. It will be stored with this name in the item.
+#   You can have as many attribute as you want
+# <attribute-name> [https://minecraft.wiki/w/Attribute#Attributes] :
 #   The attribute to modify. It will be skipped if the value is null, if the attribute is invalid or if the attribute
-#   isn't compatible with the specified entity type. You can have as many attribute as you want
-# <attribute-uuid> [UUID] : An uuid that identify this attribute. Random by default
-# <attribute-name> [String] : The name of this attribute. (REQUIRED only for this attribute, not for the global entity)
-# <attribute-amount> [double] : The modifier amount. (REQUIRED only for this attribute, not for the global entity)
+#   isn't compatible with the specified entity type. (REQUIRED only for this attribute, not for the global item)
+# <attribute-amount> [double] : The modifier amount. (REQUIRED only for this attribute, not for the global item)
 # <attribute-operation> [https://hub.spigotmc.org/javadocs/spigot/org/bukkit/attribute/AttributeModifier.Operation.html] :
-#   The operation to apply to the attribute. (REQUIRED only for this attribute, not for the global entity)
-# <attribute-slot> [https://hub.spigotmc.org/javadocs/spigot/org/bukkit/inventory/EquipmentSlot.html] :
-#   The slot in which the modifier is active. If not present, the modifier is effective permanently (default)
+#   The operation to apply to the attribute. ADD_NUMBER by default
+# <attribute-slot> ['any', 'armor', 'chest', 'feet', 'hand', 'head', 'legs', 'mainhand', 'offhand'] :
+#   The slot in which the modifier is active. 'any' by default
 #
 # Head
 # This section is used only if the item is a player skull
-# <head-texture> [String] : The texture string of the skin to apply to the head
-# <head-signature> [String] : The signature string of the skin to apply to the head
+# <head-id> [UUID] : The uuid to store in the head (OPTIONAL)
+# <head-name> [String] : The name to store in the head (OPTIONAL)
+# <head-url> [URL] : The texture url to apply (REQUIRED)
 ```
 
 - Inventory
@@ -128,4 +135,4 @@ How to include the API with Maven:
 
 ## Building
 
-Just clone the repository and do `mvn clean install` or `mvn clean package`. The .jar is in the _target_ directory.
+Just clone the repository and do `./gradlew clean build`. The .jar is in the _plugin/build/libs_ directory.

@@ -1,22 +1,27 @@
 package fr.flowsqy.abstractmenu.item;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import fr.flowsqy.abstractmenu.AbstractMenuPlugin;
 
 public class ItemBuilderSerializer {
 
@@ -66,7 +71,7 @@ public class ItemBuilderSerializer {
         if (!itemBuilder.attributes().isEmpty()) {
             final ConfigurationSection attributeSection = section.createSection("attributes");
             itemBuilder.attributes().forEach((attribute, modifier) -> {
-                final ConfigurationSection subSection = attributeSection.createSection(attribute.name().toLowerCase());
+                final ConfigurationSection subSection = attributeSection.createSection(modifier.getKey().getKey());
                 subSection.set("attribute", modifier.getKey().toString());
                 subSection.set("amount", modifier.getAmount());
                 subSection.set("operation", modifier.getOperation().name());
@@ -90,12 +95,16 @@ public class ItemBuilderSerializer {
         }
     }
 
-    public static ItemBuilder deserialize(ConfigurationSection section) {
-        Objects.requireNonNull(section);
+    @NotNull
+    public static ItemBuilder deserialize(@NotNull ConfigurationSection section) {
+        return deserialize(section, JavaPlugin.getPlugin(AbstractMenuPlugin.class).getLogger());
+    }
 
+    @NotNull
+    public static ItemBuilder deserialize(@NotNull ConfigurationSection section, @NotNull Logger logger) {
         final ItemBuilder builder = new ItemBuilder();
 
-        builder.material(getEnumConstant(Material.class, section.getString("type")));
+        builder.material(deserializeMaterial(section.getString("type"), logger));
 
         String name = section.getString("name");
         if (name != null) {
@@ -125,86 +134,141 @@ public class ItemBuilderSerializer {
         final ConfigurationSection enchantsSection = section.getConfigurationSection("enchants");
         if (enchantsSection != null) {
             for (String enchantKey : enchantsSection.getKeys(false)) {
-                final String levelString = enchantsSection.getString(enchantKey);
-                if (levelString == null)
-                    continue;
-                final int level;
-                try {
-                    level = Integer.parseInt(levelString);
-                } catch (NumberFormatException ignored) {
+                final var enchantSection = enchantsSection.getConfigurationSection(enchantKey);
+                if (enchantSection == null) {
                     continue;
                 }
-
-                final Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantKey));
-
-                builder.enchants(enchantment, level);
+                final var rawEnchant = enchantSection.getString("enchant");
+                if (rawEnchant == null) {
+                    continue;
+                }
+                final var enchantNamespacedKey = NamespacedKey.fromString(rawEnchant);
+                if (enchantNamespacedKey == null) {
+                    logger.warning("'" + rawEnchant + "' is not a valid ressource location");
+                    continue;
+                }
+                final var enchant = Registry.ENCHANTMENT.get(enchantNamespacedKey);
+                if (enchant == null) {
+                    logger.warning("'" + rawEnchant + "' is not a valid enchantment");
+                    continue;
+                }
+                final String rawLevel = enchantsSection.getString(enchantKey);
+                if (rawLevel == null) {
+                    logger.warning("'" + rawEnchant + "' does not specify a level");
+                    continue;
+                }
+                final int level;
+                try {
+                    level = Integer.parseInt(rawLevel);
+                } catch (NumberFormatException ignored) {
+                    logger.warning("'" + rawLevel + "' is not a valid number");
+                    continue;
+                }
+                builder.enchants(enchant, level);
             }
         }
 
         final List<String> flags = section.getStringList("flags");
         for (String flagString : flags) {
-            final ItemFlag flag = getEnumConstant(ItemFlag.class, flagString);
+            final ItemFlag flag = getEnumConstant(ItemFlag.class, flagString, null);
             builder.flags(flag);
         }
 
         final ConfigurationSection attributesSection = section.getConfigurationSection("attributes");
         if (attributesSection != null) {
-            for (final String attributeKey : attributesSection.getKeys(false)) {
+            final var pluginInstance = JavaPlugin.getProvidingPlugin(AbstractMenuPlugin.class);
+            for (String attributeKey : attributesSection.getKeys(false)) {
+                final NamespacedKey storedAttributeKey;
+                try {
+                    storedAttributeKey = new NamespacedKey(pluginInstance, attributeKey);
+                } catch (Exception e) {
+                    logger.warning("'" + attributeKey + "' is not a valid ressource key");
+                    continue;
+                }
                 final ConfigurationSection attributeSection = attributesSection.getConfigurationSection(attributeKey);
-                if (attributeSection == null)
-                    continue;
-
-                final Attribute attribute = getEnumConstant(Attribute.class, attributeKey);
-                if (attribute == null)
-                    continue;
-
-                final String rawUuid = attributeSection.getString("uuid", "");
-                UUID uuid;
-                try {
-                    uuid = UUID.fromString(rawUuid);
-                } catch (Exception ignored) {
-                    uuid = UUID.randomUUID();
-                }
-                final String modifierName = attributeSection.getString("name");
-                if (modifierName == null)
-                    continue;
-
-                final String modifierAmountString = attributeSection.getString("amount");
-                if (modifierAmountString == null)
-                    continue;
-                final double modifierAmount;
-                try {
-                    modifierAmount = Double.parseDouble(modifierAmountString);
-                } catch (NumberFormatException ignored) {
+                if (attributeSection == null) {
                     continue;
                 }
-
-                final String operationString = attributeSection.getString("operation");
+                final String rawAttribute = attributeSection.getString("attribute");
+                if (rawAttribute == null) {
+                    logger.warning("'" + attributeKey + "' should specify an attribute name");
+                    continue;
+                }
+                final NamespacedKey attributeNamespacedKey = NamespacedKey.fromString(rawAttribute);
+                if (attributeNamespacedKey == null) {
+                    logger.warning("'" + rawAttribute + "' is not a valid ressource location");
+                    continue;
+                }
+                final Attribute attribute = Registry.ATTRIBUTE.get(attributeNamespacedKey);
+                if (attribute == null) {
+                    logger.warning("'" + attributeNamespacedKey.toString() + "' is not a valid attribute name");
+                    continue;
+                }
+                final double value = attributeSection.getDouble("amount", 0d);
+                if (value == 0) {
+                    continue;
+                }
+                final EquipmentSlotGroup slotGroup = getEquipmentSlotGroup(attributeSection.getString("slot-group"));
                 final AttributeModifier.Operation operation = getEnumConstant(AttributeModifier.Operation.class,
-                        operationString);
-                if (operation == null)
-                    continue;
-
-                final EquipmentSlot slot = getEnumConstant(EquipmentSlot.class, attributeSection.getString("slot"));
-
-                final AttributeModifier modifier = new AttributeModifier(uuid, modifierName, modifierAmount, operation,
-                        slot);
-
-                builder.attributes(attribute, modifier);
+                        attributeSection.getString("operation"), AttributeModifier.Operation.ADD_NUMBER);
+                builder.attributes(attribute, new AttributeModifier(storedAttributeKey, value, operation, slotGroup));
             }
         }
 
         final ConfigurationSection headDataSection = section.getConfigurationSection("head-data");
         if (headDataSection != null) {
-            // TODO Deserialize correctly textures
-            final String texture = headDataSection.getString("texture");
-            final String signature = headDataSection.getString("signature");
-            // builder.headData(texture, signature);
+            builder.headData(deserializeHeadData(headDataSection, logger));
         }
 
         return builder;
     }
 
+    @Nullable
+    private static Material deserializeMaterial(@Nullable String rawType, @NotNull Logger logger) {
+        if (rawType == null) {
+            return null;
+        }
+        final var typeKey = NamespacedKey.fromString(rawType);
+        if (typeKey == null) {
+            logger.warning("'" + rawType + "' is not a valid ressource location");
+            return null;
+        }
+        final var type = Registry.MATERIAL.get(typeKey);
+        if (type == null) {
+            logger.warning("'" + rawType + "' is not a valid material");
+            return null;
+        }
+        return type;
+    }
+
+    @Nullable
+    private static HeadData deserializeHeadData(@NotNull ConfigurationSection headDataSection, @NotNull Logger logger) {
+        final var rawUrl = headDataSection.getString("url");
+        if (rawUrl == null) {
+            return null;
+        }
+        final URL textureUrl;
+        try {
+            textureUrl = URI.create(rawUrl).toURL();
+        } catch (Exception e) {
+            logger.warning("'" + rawUrl + "' is not an url. " + e.getMessage());
+            return null;
+        }
+        UUID id = null;
+        final var rawId = headDataSection.getString("id");
+        if (rawId != null) {
+            try {
+                id = UUID.fromString(rawId);
+            } catch (IllegalArgumentException e) {
+                logger.warning("'" + rawId + "' is not a valid UUID. " + e.getMessage());
+            }
+        }
+        final var rawName = headDataSection.getString("name");
+        final var name = rawName == null || rawName.isEmpty() ? null : rawName;
+        return new HeadData(id, name, textureUrl);
+    }
+
+    @NotNull
     private static String getSlotGroupName(@NotNull EquipmentSlotGroup slotGroup) {
         if (slotGroup == EquipmentSlotGroup.ANY) {
             return "any";
@@ -236,10 +300,28 @@ public class ItemBuilderSerializer {
         return "any";
     }
 
-    @Nullable
-    private static <T extends Enum<T>> T agetEnumConstant(Class<T> enumClass, String value) {
+    @NotNull
+    private static EquipmentSlotGroup getEquipmentSlotGroup(@Nullable String value) {
+        if (value == null) {
+            return EquipmentSlotGroup.ANY;
+        }
+        return switch (value) {
+            case "any" -> EquipmentSlotGroup.ANY;
+            case "armor" -> EquipmentSlotGroup.ARMOR;
+            case "chest" -> EquipmentSlotGroup.CHEST;
+            case "feet" -> EquipmentSlotGroup.FEET;
+            case "hand" -> EquipmentSlotGroup.HAND;
+            case "head" -> EquipmentSlotGroup.HEAD;
+            case "legs" -> EquipmentSlotGroup.LEGS;
+            case "mainhand" -> EquipmentSlotGroup.MAINHAND;
+            case "offhand" -> EquipmentSlotGroup.OFFHAND;
+            default -> EquipmentSlotGroup.ANY;
+        };
+    }
+
+    private static <T extends Enum<T>> T getEnumConstant(Class<T> enumClass, String value, @Nullable T defaultValue) {
         if (enumClass == null || value == null)
-            return null;
+            return defaultValue;
 
         value = value.trim().toUpperCase();
 
@@ -248,7 +330,7 @@ public class ItemBuilderSerializer {
                 return constant;
         }
 
-        return null;
+        return defaultValue;
     }
 
 }

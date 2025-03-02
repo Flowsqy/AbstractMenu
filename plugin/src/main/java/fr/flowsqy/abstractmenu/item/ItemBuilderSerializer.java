@@ -152,7 +152,7 @@ public class ItemBuilderSerializer {
                     logger.warning("'" + rawEnchant + "' is not a valid enchantment");
                     continue;
                 }
-                final String rawLevel = enchantsSection.getString(enchantKey);
+                final String rawLevel = enchantSection.getString("level");
                 if (rawLevel == null) {
                     logger.warning("'" + rawEnchant + "' does not specify a level");
                     continue;

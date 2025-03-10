@@ -127,7 +127,7 @@ How to include the API with Maven:
         <dependency>
             <groupId>com.github.Flowsqy</groupId>
             <artifactId>AbstractMenu</artifactId>
-            <version>2.0.1</version>
+            <version>2.0.3</version>
         </dependency>
     </dependencies>
 </project>
